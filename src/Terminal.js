@@ -1,51 +1,60 @@
-// import * as io from 'socket.io-client'
-import React, { useEffect, useRef } from 'react';
+import 'xterm/css/xterm.css';
+import * as io from 'socket.io-client'
+import React, { useContext, useEffect, useRef } from 'react';
 import { FitAddon } from 'xterm-addon-fit'
 import { Terminal as XTerm } from 'xterm'
 
-import 'xterm/css/xterm.css';
 import './Terminal.css';
 
-function Terminal() {
-  const terminalContainer = useRef(null);
+import { Context as CurrentUserContext } from './CurrentUserContext';
+
+function useTerminal(containerRef) {
+  const { currentUser } = useContext(CurrentUserContext);
 
   useEffect(() => {
     const term = new XTerm();
     const fitAddon = new FitAddon();
 
     term.loadAddon(fitAddon)
-    term.open(terminalContainer.current);
+    term.open(containerRef.current);
     term.focus();
     fitAddon.fit()
 
-    term.prompt = () => {
-      term.write('\r\n$ ');
-    };
-
-    term.writeln('Welcome to xterm.js');
-    term.writeln('This is a local terminal emulation, without a real terminal in the back-end.');
-    term.writeln('Type some keys and commands to play around.');
-    term.writeln('');
-    term.prompt();
-
-    term.onKey((e: { key: string, domEvent: KeyboardEvent }) => {
-      const ev = e.domEvent;
-      const printable = !ev.altKey && !ev.ctrlKey && !ev.metaKey;
-
-      if (ev.keyCode === 13) {
-        term.prompt();
-      } else if (ev.keyCode === 8) {
-        // Do not delete the prompt
-        if (term._core.buffer.x > 2) {
-          term.write('\b \b');
-        }
-      } else if (printable) {
-        term.write(e.key);
+    fetch("http://localhost:2222/ssh/host/localhost", {
+      credentials: 'include',
+      headers: {
+        Authorization: currentUser.authToken,
       }
-    });
+    }).then(response => {
 
+      if (response.ok) {
+        const socket = io.connect("http://localhost:2222", {
+          path: '/ssh/socket.io',
+        });
 
-  }, [ ]);
+        term.onData(function (data) {
+          socket.emit('data', data)
+        })
+
+        socket.on('data', function (data) {
+          term.write(data)
+        })
+
+        socket.on('connect', function () {
+          socket.emit('geometry', term.cols, term.rows)
+        })
+      }
+    })
+
+    // XXX dispose function.
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ containerRef.current ]);
+}
+
+function Terminal() {
+  const terminalContainer = useRef(null);
+  useTerminal(terminalContainer);
 
   return (
     <div
