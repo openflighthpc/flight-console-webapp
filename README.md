@@ -1,68 +1,188 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Flight Console Webapp
 
-## Available Scripts
+A web app to provide browser access to an interactive terminal console.
 
-In the project directory, you can run:
+## Overview
 
-### `yarn start`
+Flight Console Webapp is a web application that in conjunction with [Flight
+Console WebAPI](https://github.com/openflighthpc/flight-console-webapi)
+provides browser access to an interactive terminal console session within HPC
+environments.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Installation
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+### From source
 
-### `yarn test`
+Flight Console Webapp requires a recent version of Node and `yarn`.
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The following will install from source using `git`:
 
-### `yarn build`
+```
+git clone https://github.com/alces-flight/flight-console-webapp.git
+cd flight-console-webapp
+yarn install
+yarn run build
+```
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Flight Console Webapp has been built into `build/`.  It can be served by any
+webserver configured to serve static files from that directory.  By default,
+Flight Console Webapp expects to be served from a path of `/console`.  If that
+does not suit your needs, see the configuration section below for details on
+how to configure it.
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+Before Flight Console Webapp is ready for use some additional configuration to
+inform Flight Console Webapp about the cluster is required.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+This is done by editing the file `build/config.json`.  You will need to
+provide values for the following:
 
-### `yarn eject`
+**clusterName**: Set it to a string that identifies this cluster in a human
+friendly way.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+**clusterDescription**: Set this to a human-friendly description of the
+cluster that we are connecting to.  This could be used to describe its purpose
+or the features that it supports.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+**clusterLogo**: Optionally, set it to the URL for a logo for this cluster.
+Or leave it unset.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+**apiRootUrl**: Set this to the root URL for the Flight Console Rest API for
+the cluster that is being managed.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+**websocketPathPrefix**: Set this to the path prefix that is proxied to
+websocket connections.
 
-## Learn More
+**websocketPathIp**: The IP that the websocket proxy uses to connect to the
+websockify process.  If unset, the IP address reported by the session will be
+used.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+If the websocket proxy and the websockify process are running on the same
+machine, you probably want to set this to "127.0.0.1".  If they are not,
+you probably want to not have this set.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Installing with Flight Runway
 
-### Code Splitting
+Flight Runway provides a Ruby environment and command-line helpers for
+running openflightHPC tools.  Flight Console Webapp integrates with Flight
+Runway to provide easier installation and configuration.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+To install Flight Runway, see the [Flight Runway installation
+docs](https://github.com/openflighthpc/flight-runway#installation).
 
-### Analyzing the Bundle Size
+These instructions assume that `flight-runway` has been installed from
+the openflightHPC yum repository and that either [system-wide
+integration](https://github.com/openflighthpc/flight-runway#system-wide-integration)
+has been enabled or the
+[`flight-starter`](https://github.com/openflighthpc/flight-starter) tool has
+been installed and the environment activated with the `flight start` command.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+ * Enable the Alces Flight RPM repository:
 
-### Making a Progressive Web App
+    ```
+    yum install -e0 https://repo.openflighthpc.org/openflight/centos/7/x86_64/openflighthpc-release-2-1.noarch.rpm
+    ```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+ * Rebuild your `yum` cache:
 
-### Advanced Configuration
+    ```
+    yum makecache
+    ```
+    
+ * Install the `flight-console-webapp` RPM:
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+    ```
+    [root@myhost ~]# yum install flight-console-webapp
+    ```
 
-### Deployment
+ * Enable HTTPs support
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+    Flight Console Webapp is designed to operate over HTTPs connections.  You
+    can enable HTTPs with self-signed certificates by running the commands
+    below.  You will be asked to enter a passphrase and to answer some
+    questions about your organization.
 
-### `yarn build` fails to minify
+    ```
+    [root@myhost ~]# flight www enable-https
+    ```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+ * Configure details about your cluster
+
+    Flight Console Webapp needs to be configured with some details about the
+    cluster it is providing access to.  This can be done with the `flight
+    service configure` command as described below.  You will be asked to
+    provide values for:
+
+    **Cluster name**: set it to a string that identifies this cluster in a
+    human friendly way.
+
+    **Cluster description**: set it to a string that describes this cluster in
+    a human friendly way.
+
+    **Cluster logo URL**: Optionally, set it to the URL for a logo for this
+    cluster.  Or leave it unset.
+
+    **Hostname or IP address**: set this to either the fully qualified
+    hostname for your server or its IP address.  If using the hostname, make
+    sure that it can be resolved correctly.
+
+    Once you have values for the above, you can configure the webapp by running:
+
+    ```
+    [root@myhost ~]# flight service configure console-webapp
+    ```
+
+
+## Configuration
+
+The installation section details the configuration that is required for Flight
+Console Webapp.  Additionally, when installing from source, you may also
+configure the path at which the built application is to be mounted.
+
+**Mount point**
+
+By default, the built web application expects to be mounted at the path
+`/console`.  This setting can be changed by editing three settings across two
+files.
+
+First, edit the file `.env` and change the settings for `REACT_APP_MOUNT_PATH`
+and `REACT_APP_CONFIG_FILE` to contain the desired mount path.
+
+Second, edit the file `package.json` and change the setting in `homepage` to
+contain the desired mount path.
+
+## Operation
+
+Open your browser and visit the URL for your cluster with path `/console`.
+E.g., if you have installed on a machine called `my.cluster.com` visit the URL
+https://my.cluster.com/console.
+
+Enter your username and password for the cluster.  You will then be presented
+with an interactive terminal console session.
+
+
+# Contributing
+
+Fork the project. Make your feature addition or bug fix. Send a pull
+request. Bonus points for topic branches.
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
+
+# Copyright and License
+
+Eclipse Public License 2.0, see [LICENSE.txt](LICENSE.txt) for details.
+
+Copyright (C) 2019-present Alces Flight Ltd.
+
+This program and the accompanying materials are made available under
+the terms of the Eclipse Public License 2.0 which is available at
+[https://www.eclipse.org/legal/epl-2.0](https://www.eclipse.org/legal/epl-2.0),
+or alternative license terms made available by Alces Flight Ltd -
+please direct inquiries about licensing to
+[licensing@alces-flight.com](mailto:licensing@alces-flight.com).
+
+Flight Console Webapp is distributed in the hope that it will be
+useful, but WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EITHER
+EXPRESS OR IMPLIED INCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OR
+CONDITIONS OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR
+A PARTICULAR PURPOSE. See the [Eclipse Public License 2.0](https://opensource.org/licenses/EPL-2.0) for more
+details.
