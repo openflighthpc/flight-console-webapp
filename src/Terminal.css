@@ -1,0 +1,23 @@
+#terminal-container {
+    display: block;
+    width: calc(100% - 1px);
+    margin: 0 auto;
+    padding: 2px;
+}
+
+#terminal-container .terminal {
+    background-color: #000000;
+    color: #fafafa;
+    padding: 2px;
+}
+
+#terminal-container .terminal:focus .terminal-cursor {
+    background-color: #fafafa;
+}
+
+
+.full-height {
+    /* Subtract header, footer, centernav margin, card header, card border,
+     * extra to make things nicer. */
+    height: calc( 100vh - 108px - 60px - 24px - 56px - 2px - 0px );
+}
