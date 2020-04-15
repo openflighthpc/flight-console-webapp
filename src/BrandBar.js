@@ -47,17 +47,9 @@ function NavItems() {
     <li className="nav-item">
       <Link
         className="nav-link nav-menu-button"
-        to="/sessions"
+        to="/terminal"
       >
-        My sessions
-      </Link>
-    </li>
-    <li className="nav-item">
-      <Link
-        className="nav-link nav-menu-button"
-        to="/sessions/new"
-      >
-        Launch new session
+        My terminal
       </Link>
     </li>
     </>
