@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import useFetch from 'use-http';
 
 import { Context as CurrentUserContext } from './CurrentUserContext';
@@ -13,7 +13,7 @@ export function useSignIn({ onError }) {
   const { tempUser, actions: userActions } = useContext(CurrentUserContext);
 
   useEffect(() => {
-    async function stuff() {
+    async function completeSignIn() {
       if (tempUser) {
         await get();
         if (response.ok) {
@@ -23,7 +23,7 @@ export function useSignIn({ onError }) {
         }
       }
     }
-    stuff();
+    completeSignIn();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ tempUser ]);
 
@@ -36,14 +36,17 @@ export function useSignIn({ onError }) {
 
 function useAuthCheck() {
   const { tempUser } = useContext(CurrentUserContext);
+  const tempUserRef = useRef(tempUser);
+
+  useEffect(() => { tempUserRef.current = tempUser; }, [ tempUser ]);
 
   return useFetch({
     path: "/ping",
     interceptors: {
       request: async (options, url, path, route) => {
-        if (tempUser) {
+        if (tempUserRef.current) {
           if (options.headers == null) { options.headers = {}; }
-          options.headers.Authorization = tempUser.authToken;
+          options.headers.Authorization = tempUserRef.current.authToken;
         }
         return options;
       },

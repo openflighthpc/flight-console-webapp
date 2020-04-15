@@ -31,8 +31,14 @@ function SignInForm() {
   const removeToastRef = useRef(null);
 
   async function showToast(response) {
+    let code;
+    try {
+      code = errorCode(await response.json());
+    } catch (e) {
+      code = 'unexpected';
+    }
     const { removeToast } = addToast(
-      loginErrorToast({ errorCode: errorCode(await response.json()) })
+      loginErrorToast({ errorCode: code })
     );
     removeToastRef.current = removeToast;
   }
