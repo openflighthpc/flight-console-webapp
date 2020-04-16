@@ -11,6 +11,8 @@ function useTerminal(containerRef) {
   const { get: initializeSession, response } = useInitializeSession();
 
   useEffect(() => {
+    if (containerRef.current == null) { return; }
+
     const term = new XTerm();
     const fitAddon = new FitAddon();
 
@@ -41,8 +43,10 @@ function useTerminal(containerRef) {
 
     // XXX dispose function.
 
+    // We're expecting `response` to change and don't want to re-run the hook
+    // when it does.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ containerRef.current ]);
+  }, [ containerRef, initializeSession ]);
 }
 
 function Terminal() {
