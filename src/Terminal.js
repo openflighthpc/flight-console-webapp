@@ -5,8 +5,9 @@ import { FitAddon } from 'xterm-addon-fit'
 import { Terminal as XTerm } from 'xterm'
 
 import './Terminal.css';
-import { useInitializeSession } from './api';
 import useEventListener from './useEventListener';
+import { useInitializeSession } from './api';
+import { useToast } from './ToastContext';
 
 const terminalOptions = {
   cursorBlink: true,
@@ -20,6 +21,7 @@ function useTerminal(containerRef) {
   const fitAddonRef = useRef(null);
   const socketRef = useRef(null);
   const { get: initializeSession, response } = useInitializeSession();
+  const { addToast } = useToast();
 
   useEventListener(window, 'resize', () => {
     const term = termRef.current;
@@ -67,6 +69,12 @@ function useTerminal(containerRef) {
           socket.emit('geometry', term.cols, term.rows)
         })
 
+        socket.on('ssherror', function (data) {
+          addToast(sshErrorToast({
+            message: data,
+          }));
+        })
+
         socket.on('title', function (data) {
           document.title = `Flight Console: ${data}`;
         })
@@ -97,6 +105,28 @@ function Terminal() {
     >
     </div>
   );
+}
+
+function sshErrorToast({ message }) {
+  let body = (
+    <div>
+      <p>
+        Unfortunately there has been a problem connecting to your terminal
+        console session.  Please try again and, if problems persist, help us
+        to more quickly rectify the problem by contacting us and letting us
+        know.
+      </p>
+      <p>
+        The error reported is <code>{message}</code>.
+      </p>
+    </div>
+  );
+
+  return {
+    body,
+    icon: 'danger',
+    header: 'Connection failed',
+  };
 }
 
 export default Terminal;
