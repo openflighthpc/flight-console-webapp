@@ -7,6 +7,13 @@ import { Terminal as XTerm } from 'xterm'
 import './Terminal.css';
 import { useInitializeSession } from './api';
 
+const terminalOptions = {
+  cursorBlink: true,
+  scrollback: 10000,
+  tabStopWidth: 8,
+  bellStyle: "sound",
+};
+
 function useTerminal(containerRef) {
   const { get: initializeSession, response } = useInitializeSession();
 
@@ -16,6 +23,10 @@ function useTerminal(containerRef) {
     const term = new XTerm();
     const fitAddon = new FitAddon();
 
+    term.setOption('cursorBlink', terminalOptions.cursorBlink)
+    term.setOption('scrollback', terminalOptions.scrollback)
+    term.setOption('tabStopWidth', terminalOptions.tabStopWidth)
+    term.setOption('bellStyle', terminalOptions.bellStyle)
     term.loadAddon(fitAddon)
     term.open(containerRef.current);
     term.focus();
