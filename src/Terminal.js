@@ -6,6 +6,7 @@ import { Terminal as XTerm } from 'xterm'
 
 import './Terminal.css';
 import { useInitializeSession } from './api';
+import useEventListener from './useEventListener';
 
 const terminalOptions = {
   cursorBlink: true,
@@ -15,13 +16,28 @@ const terminalOptions = {
 };
 
 function useTerminal(containerRef) {
+  const termRef = useRef(null);
+  const fitAddonRef = useRef(null);
+  const socketRef = useRef(null);
   const { get: initializeSession, response } = useInitializeSession();
+
+  useEventListener(window, 'resize', () => {
+    const term = termRef.current;
+    const socket = socketRef.current;
+    const fitAddon = fitAddonRef.current;
+    if (term != null && socket != null && fitAddon != null) {
+      fitAddon.fit();
+      socket.emit('resize', { cols: term.cols, rows: term.rows })
+    }
+  });
 
   useEffect(() => {
     if (containerRef.current == null) { return; }
 
     const term = new XTerm();
     const fitAddon = new FitAddon();
+    termRef.current = term;
+    fitAddonRef.current = fitAddon;
 
     term.setOption('cursorBlink', terminalOptions.cursorBlink)
     term.setOption('scrollback', terminalOptions.scrollback)
@@ -37,6 +53,7 @@ function useTerminal(containerRef) {
         const socket = io.connect("http://localhost:2222", {
           path: '/ssh/socket.io',
         });
+        socketRef.current = socket;
 
         term.onData(function (data) {
           socket.emit('data', data)
