@@ -53,3 +53,10 @@ function useAuthCheck() {
     },
   });
 }
+
+export function useInitializeSession() {
+  return useFetch({
+    path: "/ssh/host/localhost",
+    credentials: 'include',
+  });
+}

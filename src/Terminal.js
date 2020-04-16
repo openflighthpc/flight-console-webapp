@@ -1,15 +1,14 @@
 import 'xterm/css/xterm.css';
 import * as io from 'socket.io-client'
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { FitAddon } from 'xterm-addon-fit'
 import { Terminal as XTerm } from 'xterm'
 
 import './Terminal.css';
-
-import { Context as CurrentUserContext } from './CurrentUserContext';
+import { useInitializeSession } from './api';
 
 function useTerminal(containerRef) {
-  const { currentUser } = useContext(CurrentUserContext);
+  const { get: initializeSession, response } = useInitializeSession();
 
   useEffect(() => {
     const term = new XTerm();
@@ -20,13 +19,7 @@ function useTerminal(containerRef) {
     term.focus();
     fitAddon.fit()
 
-    fetch("http://localhost:2222/ssh/host/localhost", {
-      credentials: 'include',
-      headers: {
-        Authorization: currentUser.authToken,
-      }
-    }).then(response => {
-
+    initializeSession().then(() => {
       if (response.ok) {
         const socket = io.connect("http://localhost:2222", {
           path: '/ssh/socket.io',
