@@ -49,6 +49,14 @@ function useTerminal(containerRef) {
         socket.on('connect', function () {
           socket.emit('geometry', term.cols, term.rows)
         })
+
+        socket.on('title', function (data) {
+          document.title = `Flight Console: ${data}`;
+        })
+
+        term.onTitleChange(function (title) {
+          document.title = `Flight Console: ${title}`;
+        })
       }
     })
 
