@@ -56,8 +56,11 @@ export function useTerminal(containerRef) {
     fitAddon.fit()
     connect();
 
-
-    // XXX dispose function.
+    return function disponse() {
+      debug('disposing');
+      socketRef.current.disconnect();
+      term.dispose();
+    }
 
     // We're expecting `response` to change and don't want to re-run the hook
     // when it does.
