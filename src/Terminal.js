@@ -18,7 +18,7 @@ const terminalOptions = {
   bellStyle: "sound",
 };
 
-function useTerminal(containerRef) {
+export function useTerminal(containerRef) {
   const termRef = useRef(null);
   const fitAddonRef = useRef(null);
   const socketRef = useRef(null);
@@ -26,6 +26,7 @@ function useTerminal(containerRef) {
   const { addToast } = useToast();
   // Possible states are `uninitialized`, `connected`, `disconnected`.
   const [ terminalState, setTerminalState ] = useState('uninitialized');
+  const [ title, setTitle ] = useState('');
 
   useEventListener(window, 'resize', () => {
     const term = termRef.current;
@@ -53,7 +54,18 @@ function useTerminal(containerRef) {
     term.open(containerRef.current);
     term.focus();
     fitAddon.fit()
+    connect();
 
+
+    // XXX dispose function.
+
+    // We're expecting `response` to change and don't want to re-run the hook
+    // when it does.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ containerRef, initializeSession ]);
+
+  function connect() {
+    const term = termRef.current;
     debug('initializing session');
     initializeSession().then(() => {
       if (response.ok) {
@@ -146,42 +158,48 @@ function useTerminal(containerRef) {
           setTerminalState('error');
         })
 
-        term.onTitleChange(function (title) {
-          document.title = `Flight Console: ${title}`;
-        })
+        term.onTitleChange((title) => {
+          let fullTitle;
+          if (/^\s*$/.test(title)) {
+            fullTitle = 'Flight Console';
+          } else {
+            fullTitle = `Flight Console: ${title}`;
+          }
+          document.title = fullTitle;
+          setTitle(fullTitle);
+        });
 
       } else {
         debug('session initialization failed');
         setTerminalState('disconnected');
       }
     })
+  }
 
-    // XXX dispose function.
+  function onDisconnect() {
+    debug('disconnecting');
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+    }
+  }
 
-    // We're expecting `response` to change and don't want to re-run the hook
-    // when it does.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ containerRef, initializeSession ]);
+  function onReconnect() {
+    debug('reconnecting');
+    termRef.current.reset();
+    connect();
+    termRef.current.focus();
+  }
 
-  return terminalState;
+  return { onDisconnect, onReconnect, terminalState, title };
 }
 
-function Terminal() {
-  const terminalContainer = useRef(null);
-  const terminalState = useTerminal(terminalContainer);
-
+function Terminal(props, ref) {
   return (
-    <React.Fragment>
-      <div className="bg-light">
-        State: {terminalState}
-      </div>
-      <div
-        id="terminal-container"
-        className="terminal full-height"
-        ref={terminalContainer}
-      >
-      </div>
-    </React.Fragment>
+    <div
+      id="terminal-container"
+      className="terminal full-height"
+      ref={ref}
+    />
   );
 }
 
@@ -207,4 +225,4 @@ function sshErrorToast({ message }) {
   };
 }
 
-export default Terminal;
+export default React.forwardRef(Terminal);
