@@ -75,10 +75,6 @@ function useTerminal(containerRef) {
           }));
         })
 
-        socket.on('title', function (data) {
-          document.title = `Flight Console: ${data}`;
-        })
-
         term.onTitleChange(function (title) {
           document.title = `Flight Console: ${title}`;
         })
