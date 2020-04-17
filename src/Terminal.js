@@ -1,6 +1,7 @@
 import 'xterm/css/xterm.css';
 import * as io from 'socket.io-client'
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import mkDebug from 'debug';
 import { FitAddon } from 'xterm-addon-fit'
 import { Terminal as XTerm } from 'xterm'
 
@@ -9,6 +10,7 @@ import useEventListener from './useEventListener';
 import { useInitializeSession } from './api';
 import { useToast } from './ToastContext';
 
+const debug = mkDebug('flight:Terminal');
 const terminalOptions = {
   cursorBlink: true,
   scrollback: 10000,
@@ -22,6 +24,8 @@ function useTerminal(containerRef) {
   const socketRef = useRef(null);
   const { get: initializeSession, response } = useInitializeSession();
   const { addToast } = useToast();
+  // Possible states are `uninitialized`, `connected`, `disconnected`.
+  const [ terminalState, setTerminalState ] = useState('uninitialized');
 
   useEventListener(window, 'resize', () => {
     const term = termRef.current;
@@ -50,12 +54,15 @@ function useTerminal(containerRef) {
     term.focus();
     fitAddon.fit()
 
+    debug('initializing session');
     initializeSession().then(() => {
       if (response.ok) {
+        debug('initializing socket');
         const socket = io.connect("http://localhost:2222", {
           path: '/ssh/socket.io',
         });
         socketRef.current = socket;
+        setTerminalState('connected');
 
         term.onData(function (data) {
           socket.emit('data', data)
@@ -70,14 +77,82 @@ function useTerminal(containerRef) {
         })
 
         socket.on('ssherror', function (data) {
-          addToast(sshErrorToast({
-            message: data,
-          }));
+          debug('ssherror %s', data);
+          if (data.startsWith('401 UNAUTHORIZED')) {
+            // The web session with the API server has not been initialized.
+            // The server has disconnected the socket.
+
+          } else if (data.startsWith('SSH EXEC ERROR')) {
+            // The SSH process couldn't be started. The socket.io socket is
+            // still good.
+            addToast(sshErrorToast({ message: 'SSH EXEC ERROR' }));
+            setTerminalState('disconnected');
+
+          } else if (data.startsWith('WEBSOCKET ERROR')) {
+            // The SSH connection to the host wasn't successful. The socket.io
+            // socket has been disconnected by the server.
+            addToast(sshErrorToast({ message: 'WEBSOCKET ERROR' }));
+
+          } else if (data.startsWith('SSH CONN ERROR')) {
+            // There has been an error with the SSH connection; the socket.io
+            // socket is still good.
+            addToast(sshErrorToast({ message: 'SSH CONN ERROR' }));
+            setTerminalState('disconnected');
+
+          } else if (data.startsWith('SSH CONN CLOSE')) {
+            // The SSH connection has been closed.  Presumably by the user
+            // themselves. The socket.io socket is still good.
+            setTerminalState('disconnected');
+
+          } else if (data.startsWith('SSH CONN END BY HOST')) {
+            // The SSH connection has been closed by the host. The socket.io
+            // socket is still good.
+            addToast(sshErrorToast({ message: 'SSH CONN END BY HOST' }));
+            setTerminalState('disconnected');
+
+          } else if (data.startsWith('SSH STREAM CLOSE')) {
+            // The SSH stream has been closed; the server has closed the SSH
+            // connection.  The socket.io socket is still good.
+            // addToast(sshErrorToast({ message: 'SSH STREAM CLOSE' }));
+            setTerminalState('disconnected');
+
+          } else if (data.startsWith('SSH SOCKET ERROR')) {
+            // A socket.io error has been reported. The server has closed the
+            // SSH connection.  A socket.io error will likely be reported here
+            // too.
+
+          } else if (data.startsWith('SSH CLIENT SOCKET DISCONNECT')) {
+            // The client has disconnected; the server has closed the SSH
+            // connection.  This will be dealt with by the disconnect handler.
+          }
+          addToast(sshErrorToast({ message: data }));
+        })
+
+        socket.on('disconnect', function (err) {
+          // if (!errorExists) {
+          //   status.style.backgroundColor = 'red'
+          //   status.innerHTML =
+          //     'WEBSOCKET SERVER DISCONNECTED: ' + err
+          // }
+          debug('socket disconnected: %s', err);
+          socket.io.reconnection(false);
+          setTerminalState('disconnected');
+        })
+
+        socket.on('error', function (err) {
+          // There has been an error with the socket.  This is a transport
+          // error not an application error.
+          debug('socket error: %s', err);
+          setTerminalState('error');
         })
 
         term.onTitleChange(function (title) {
           document.title = `Flight Console: ${title}`;
         })
+
+      } else {
+        debug('session initialization failed');
+        setTerminalState('disconnected');
       }
     })
 
@@ -87,19 +162,26 @@ function useTerminal(containerRef) {
     // when it does.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ containerRef, initializeSession ]);
+
+  return terminalState;
 }
 
 function Terminal() {
   const terminalContainer = useRef(null);
-  useTerminal(terminalContainer);
+  const terminalState = useTerminal(terminalContainer);
 
   return (
-    <div
-      id="terminal-container"
-      className="terminal full-height"
-      ref={terminalContainer}
-    >
-    </div>
+    <React.Fragment>
+      <div className="bg-light">
+        State: {terminalState}
+      </div>
+      <div
+        id="terminal-container"
+        className="terminal full-height"
+        ref={terminalContainer}
+      >
+      </div>
+    </React.Fragment>
   );
 }
 
