@@ -193,7 +193,11 @@ export function useTerminal(containerRef) {
     termRef.current.focus();
   }
 
-  return { onDisconnect, onReconnect, terminalState, title };
+  function focus() {
+    termRef.current.focus();
+  }
+
+  return { focus, onDisconnect, onReconnect, terminalState, title };
 }
 
 function Terminal(props, ref) {

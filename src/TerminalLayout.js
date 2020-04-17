@@ -1,6 +1,15 @@
 import React from 'react';
 
-function TerminalLayout({ children, onDisconnect, onReconnect, terminalState, title }) {
+import FullscreenButton from './FullscreenButton';
+
+function TerminalLayout({
+  children,
+  onFullscreenChange,
+  onDisconnect,
+  onReconnect,
+  terminalState,
+  title,
+}) {
   return (
     <div className="overflow-auto">
       <div className="row no-gutters">
@@ -16,6 +25,7 @@ function TerminalLayout({ children, onDisconnect, onReconnect, terminalState, ti
                     <Toolbar
                       terminalState={terminalState}
                       onDisconnect={onDisconnect}
+                      onFullscreenChange={onFullscreenChange}
                       onReconnect={onReconnect}
                     />
                   </div>
@@ -35,6 +45,7 @@ function TerminalLayout({ children, onDisconnect, onReconnect, terminalState, ti
 
 function Toolbar({
   onDisconnect,
+  onFullscreenChange,
   onReconnect,
   terminalState,
 }) {
@@ -58,10 +69,13 @@ function Toolbar({
     </button>
   ) : null;
 
-  // const fullscreenBtn = <FullscreenButton session={session} />;
+  const fullscreenBtn = terminalState === 'connected' ?
+    <FullscreenButton callback={onFullscreenChange} /> :
+    null;
 
   return (
     <div className="btn-toolbar" style={{ minHeight: '31px' }}>
+      {fullscreenBtn}
       {disconnectBtn}
       {reconnectBtn}
     </div>
