@@ -41,7 +41,8 @@ function useAuthCheck() {
   useEffect(() => { tempUserRef.current = tempUser; }, [ tempUser ]);
 
   return useFetch({
-    path: "/ping",
+    path: "/ssh/host/localhost",
+    credentials: 'include',
     interceptors: {
       request: async (options, url, path, route) => {
         if (tempUserRef.current) {
