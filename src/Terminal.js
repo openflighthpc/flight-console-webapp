@@ -58,7 +58,9 @@ export function useTerminal(containerRef) {
 
     return function disponse() {
       debug('disposing');
-      socketRef.current.disconnect();
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
       term.dispose();
     }
 
