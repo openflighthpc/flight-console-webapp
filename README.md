@@ -18,7 +18,7 @@ Flight Console Webapp requires a recent version of Node and `yarn`.
 The following will install from source using `git`:
 
 ```
-git clone https://github.com/alces-flight/flight-console-webapp.git
+git clone https://github.com/openflighthpc/flight-console-webapp.git
 cd flight-console-webapp
 yarn install
 yarn run build
