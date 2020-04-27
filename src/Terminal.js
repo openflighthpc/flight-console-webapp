@@ -1,12 +1,13 @@
 import 'xterm/css/xterm.css';
 import * as io from 'socket.io-client'
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import mkDebug from 'debug';
 import { FitAddon } from 'xterm-addon-fit'
 import { Terminal as XTerm } from 'xterm'
 
 import './Terminal.css';
 import useEventListener from './useEventListener';
+import { Context as ConfigContext } from './ConfigContext';
 import { useInitializeSession } from './api';
 import { useToast } from './ToastContext';
 
@@ -19,6 +20,7 @@ const terminalOptions = {
 };
 
 export function useTerminal(containerRef) {
+  const config = useContext(ConfigContext);
   const termRef = useRef(null);
   const fitAddonRef = useRef(null);
   const socketRef = useRef(null);
@@ -75,7 +77,7 @@ export function useTerminal(containerRef) {
     initializeSession().then(() => {
       if (response.ok) {
         debug('initializing socket');
-        const socket = io.connect("http://localhost:2222", {
+        const socket = io.connect(config.apiRootUrl, {
           path: '/ssh/socket.io',
         });
         socketRef.current = socket;
@@ -160,6 +162,7 @@ export function useTerminal(containerRef) {
           // There has been an error with the socket.  This is a transport
           // error not an application error.
           debug('socket error: %s', err);
+          addToast(sshErrorToast({ message: err }));
           setTerminalState('error');
         })
 
