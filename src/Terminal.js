@@ -19,6 +19,18 @@ const terminalOptions = {
   bellStyle: "sound",
 };
 
+function buildSocketIOParams(config) {
+  const apiUrl = new URL(config.apiRootUrl);
+  const wsUrl = new URL(config.apiRootUrl);
+  wsUrl.pathname = '';
+  let path = '/ssh/socket.io';
+  if (apiUrl.pathname !== '/') {
+    path = `${apiUrl.pathname}${path}`;
+  }
+
+  return [ wsUrl.toString(), { path } ];
+}
+
 export function useTerminal(containerRef) {
   const config = useContext(ConfigContext);
   const termRef = useRef(null);
@@ -76,10 +88,9 @@ export function useTerminal(containerRef) {
     debug('initializing session');
     initializeSession().then(() => {
       if (response.ok) {
-        debug('initializing socket');
-        const socket = io.connect(config.apiRootUrl, {
-          path: '/ssh/socket.io',
-        });
+        const [ url, params ] = buildSocketIOParams(config);
+        debug('initializing socket: %s %o', url, params);
+        const socket = io.connect(url, params);
         socketRef.current = socket;
         setTerminalState('connected');
 
