@@ -1,0 +1,6 @@
+{
+  "clusterName": "Unconfigured cluster",
+  "clusterDescription": "Description of the cluster.",
+  "clusterLogo": "https://example.com/url/for/a/cluster/logo",
+  "apiRootUrl": "https://unconfigured.cluster/console/api"
+}

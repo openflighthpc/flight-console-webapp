@@ -1,0 +1,17 @@
+{
+  # The human-friendly name of the cluster that we are connecting to.
+  "clusterName": "This deployment needs configuring",
+
+  # The human-friendly description of the cluster that we are connecting to.
+  # This could be used to describe its purpose or the features that it
+  # supports.
+  "clusterDescription": "",
+
+  # The URL of a logo for the cluster if any.
+  "clusterLogo": "",
+
+  # The root URL for the API server.
+  #
+  # The relative paths for the API server are added to this URL.
+  "apiRootUrl": "https://gateway1.my.custer/console/api",
+}
