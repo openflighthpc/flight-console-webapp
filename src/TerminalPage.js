@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import classNames from 'classnames';
 
 import useTerminal from './useTerminal';
 import TerminalLayout from './TerminalLayout';
@@ -18,7 +19,12 @@ function TerminalPage() {
     >
       <div
         id="terminal-container"
-        className="terminal full-height"
+        className={
+          classNames("terminal full-height", {
+            'terminal-connected': terminalState === 'connected',
+            'terminal-disconnected': terminalState !== 'connected',
+          })
+        }
         ref={terminalContainer}
       />
     </TerminalLayout>

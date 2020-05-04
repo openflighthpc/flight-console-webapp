@@ -11,10 +11,13 @@
     padding: 2px;
 }
 
+#terminal-container.terminal-disconnected .terminal {
+    filter: blur(1px) brightness(0.8);
+}
+
 #terminal-container .terminal:focus .terminal-cursor {
     background-color: #fafafa;
 }
-
 
 .full-height {
     /* Subtract header, footer, centernav margin, card header, card border,

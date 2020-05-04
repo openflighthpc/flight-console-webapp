@@ -60,8 +60,6 @@ function useTerminal(containerRef) {
     termRef.current = term;
     fitAddonRef.current = fitAddon;
 
-    // XXX Set to false when disconnected.
-    term.setOption('cursorBlink', terminalOptions.cursorBlink)
     term.setOption('scrollback', terminalOptions.scrollback)
     term.setOption('tabStopWidth', terminalOptions.tabStopWidth)
     term.setOption('bellStyle', terminalOptions.bellStyle)
@@ -84,6 +82,15 @@ function useTerminal(containerRef) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ containerRef, initializeSession ]);
 
+  function updateTerminalState(term, state) {
+    setTerminalState(state);
+    if (state === 'connected') {
+      term.setOption('cursorBlink', terminalOptions.cursorBlink);
+    } else {
+      term.setOption('cursorBlink', false);
+    }
+  }
+
   function connect() {
     const term = termRef.current;
     debug('initializing session');
@@ -93,7 +100,7 @@ function useTerminal(containerRef) {
         debug('initializing socket: %s %o', url, params);
         const socket = io.connect(url, params);
         socketRef.current = socket;
-        setTerminalState('connected');
+        updateTerminalState(term, 'connected');
 
         term.onData(function (data) {
           socket.emit('data', data)
@@ -122,7 +129,7 @@ function useTerminal(containerRef) {
             // The SSH process couldn't be started. The socket.io socket is
             // still good.
             addToast(sshErrorToast({ message: 'SSH EXEC ERROR' }));
-            setTerminalState('disconnected');
+            updateTerminalState(term, 'disconnected');
 
           } else if (data.startsWith('WEBSOCKET ERROR')) {
             // The SSH connection to the host wasn't successful. The socket.io
@@ -133,24 +140,24 @@ function useTerminal(containerRef) {
             // There has been an error with the SSH connection; the socket.io
             // socket is still good.
             addToast(sshErrorToast({ message: 'SSH CONN ERROR' }));
-            setTerminalState('disconnected');
+            updateTerminalState(term, 'disconnected');
 
           } else if (data.startsWith('SSH CONN CLOSE')) {
             // The SSH connection has been closed.  Presumably by the user
             // themselves. The socket.io socket is still good.
-            setTerminalState('disconnected');
+            updateTerminalState(term, 'disconnected');
 
           } else if (data.startsWith('SSH CONN END BY HOST')) {
             // The SSH connection has been closed by the host. The socket.io
             // socket is still good.
             addToast(sshErrorToast({ message: 'SSH CONN END BY HOST' }));
-            setTerminalState('disconnected');
+            updateTerminalState(term, 'disconnected');
 
           } else if (data.startsWith('SSH STREAM CLOSE')) {
             // The SSH stream has been closed; the server has closed the SSH
             // connection.  The socket.io socket is still good.
             // addToast(sshErrorToast({ message: 'SSH STREAM CLOSE' }));
-            setTerminalState('disconnected');
+            updateTerminalState(term, 'disconnected');
 
           } else if (data.startsWith('SSH SOCKET ERROR')) {
             // A socket.io error has been reported. The server has closed the
@@ -172,7 +179,7 @@ function useTerminal(containerRef) {
           // }
           debug('socket disconnected: %s', err);
           socket.io.reconnection(false);
-          setTerminalState('disconnected');
+          updateTerminalState(term, 'disconnected');
         })
 
         socket.on('error', function (err) {
@@ -180,7 +187,7 @@ function useTerminal(containerRef) {
           // error not an application error.
           debug('socket error: %s', err);
           addToast(sshErrorToast({ message: err }));
-          setTerminalState('error');
+          updateTerminalState(term, 'error');
         })
 
         term.onTitleChange((title) => {
@@ -196,7 +203,7 @@ function useTerminal(containerRef) {
 
       } else {
         debug('session initialization failed');
-        setTerminalState('disconnected');
+        updateTerminalState(term, 'disconnected');
       }
     })
   }
