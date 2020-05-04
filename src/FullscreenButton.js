@@ -27,6 +27,7 @@ function FullscreenButton({ callback }) {
         }
       }
     }; 
+    document.onfullscreenchange();
 
     return () => { document.onfullscreenchange = null; };
   }, [setFullscreen]);
