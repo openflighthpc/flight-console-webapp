@@ -41,7 +41,7 @@ function useAuthCheck() {
   useEffect(() => { tempUserRef.current = tempUser; }, [ tempUser ]);
 
   return useFetch({
-    path: "/ssh/host/localhost",
+    path: "/ssh/host/127.0.0.1",
     credentials: 'include',
     interceptors: {
       request: async (options, url, path, route) => {
@@ -57,7 +57,7 @@ function useAuthCheck() {
 
 export function useInitializeSession() {
   return useFetch({
-    path: "/ssh/host/localhost",
+    path: "/ssh/host/127.0.0.1",
     credentials: 'include',
   });
 }
