@@ -31,7 +31,7 @@ function buildSocketIOParams(config) {
   return [ wsUrl.toString(), { path } ];
 }
 
-export function useTerminal(containerRef) {
+function useTerminal(containerRef) {
   const config = useContext(ConfigContext);
   const termRef = useRef(null);
   const fitAddonRef = useRef(null);
@@ -60,6 +60,7 @@ export function useTerminal(containerRef) {
     termRef.current = term;
     fitAddonRef.current = fitAddon;
 
+    // XXX Set to false when disconnected.
     term.setOption('cursorBlink', terminalOptions.cursorBlink)
     term.setOption('scrollback', terminalOptions.scrollback)
     term.setOption('tabStopWidth', terminalOptions.tabStopWidth)
@@ -105,6 +106,11 @@ export function useTerminal(containerRef) {
         socket.on('connect', function () {
           socket.emit('geometry', term.cols, term.rows)
         })
+
+        socket.on('shutdownCountdownUpdate', function (secondsRemaining) {
+          // XXX Do something here.
+          console.log('secondsRemaining:', secondsRemaining);  // eslint-disable-line no-console
+        });
 
         socket.on('ssherror', function (data) {
           debug('ssherror %s', data);
@@ -216,16 +222,6 @@ export function useTerminal(containerRef) {
   return { focus, onDisconnect, onReconnect, terminalState, title };
 }
 
-function Terminal(props, ref) {
-  return (
-    <div
-      id="terminal-container"
-      className="terminal full-height"
-      ref={ref}
-    />
-  );
-}
-
 function sshErrorToast({ message }) {
   let body = (
     <div>
@@ -248,4 +244,4 @@ function sshErrorToast({ message }) {
   };
 }
 
-export default React.forwardRef(Terminal);
+export default useTerminal;

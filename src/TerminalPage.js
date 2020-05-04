@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 
-import Terminal, { useTerminal } from './Terminal';
+import useTerminal from './useTerminal';
 import TerminalLayout from './TerminalLayout';
 
 function TerminalPage() {
@@ -16,7 +16,11 @@ function TerminalPage() {
       terminalState={terminalState}
       title={title}
     >
-      <Terminal ref={terminalContainer} />
+      <div
+        id="terminal-container"
+        className="terminal full-height"
+        ref={terminalContainer}
+      />
     </TerminalLayout>
   );
 
