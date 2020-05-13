@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
 import AnimatedRouter from './AnimatedRouter';
 import BrandBar from './BrandBar';
 import Footer from './Footer';
+import { routes, unconfiguredRoutes } from './routes';
+import { Context as ConfigContext } from './ConfigContext';
 
 function AppLayout() {
+  const { unconfigured } = useContext(ConfigContext);
+
   return (
     <>
     <BrandBar />
@@ -14,7 +18,11 @@ function AppLayout() {
     >
       <div id="toast-portal"></div>
       <div className="content">
-        <AnimatedRouter sideNav={SideNav} />
+        <AnimatedRouter
+          exact={!unconfigured}
+          routes={unconfigured ? unconfiguredRoutes : routes}
+          sideNav={SideNav}
+        />
       </div>
     </div>
     <Footer />

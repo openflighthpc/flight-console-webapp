@@ -4,9 +4,8 @@ import { CSSTransition } from "react-transition-group";
 
 import AuthenticatedRoute from './AuthenticatedRoute';
 import ErrorBoundary from './ErrorBoundary';
-import routes from './routes';
 
-function AnimatedRouter({ sideNav }) {
+function AnimatedRouter({ exact, routes, sideNav }) {
   const SideNav = sideNav;
   const pageRef = useRef(null);
   useEffect(() => {
@@ -22,7 +21,7 @@ function AnimatedRouter({ sideNav }) {
       {routes.map(({ path, Component, authenticated, sideNav }) => {
         const MyRoute = authenticated ? AuthenticatedRoute : Route;
         return (
-          <MyRoute key={path} exact path={path}>
+          <MyRoute key={path} exact={exact} path={path}>
             {({ match }) => { 
               return (
                 <CSSTransition
