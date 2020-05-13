@@ -15,6 +15,12 @@ function Provider({ children }) {
 
   if (loading) {
     return <Spinner text="Loading..." />;
+  } else if (error && error.message === "Not Found") {
+    return (
+      <Context.Provider value={{ unconfigured: true }}>
+        {children}
+      </Context.Provider>
+    );
   } else if (error) {
     return <DefaultErrorMessage />;
   } else {

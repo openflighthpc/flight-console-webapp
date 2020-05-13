@@ -1,5 +1,6 @@
 import Dashboard from './Dashboard';
 import TerminalPage from './TerminalPage';
+import UnconfiguredDashboard from './UnconfiguredDashboard';
 
 const routes = [
   {
@@ -17,4 +18,16 @@ const routes = [
   },
 ]
 
-export default routes;
+const unconfiguredRoutes = [
+  {
+    path: '/',
+    name: 'Home',
+    Component: UnconfiguredDashboard,
+    sideNav: true,
+  },
+];
+
+export {
+  routes,
+  unconfiguredRoutes,
+};
