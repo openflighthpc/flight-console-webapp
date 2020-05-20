@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link } from "react-router-dom";
 
-import { CardFooter } from './CardParts';
+import './Dashboard.css';
 import Logo from './png_trans_logo.png';
+import { CardFooter } from './CardParts';
 
 function AuthenticatedDashboard() {
   return (
@@ -16,8 +17,8 @@ function AuthenticatedDashboard() {
       </img>
 
       <div className="card-deck">
-        <div className="card view-running-sessions">
-          <div className="card-body">
+        <div className="card">
+          <div className="card-body fa-background fa-background-terminal">
             <h5 className="card-title text-center">
               Connect to your terminal console
             </h5>
