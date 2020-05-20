@@ -24,11 +24,13 @@ function UnconfiguredDashboard() {
         by your system administrator.  It can be configured by running:
       </p>
 
-      <pre>
-        <code>
-          flight service configure console-webapp
-        </code>
-      </pre>
+      <div className="card card-body">
+        <pre className="mb-0">
+          <code>
+            flight service configure console-webapp
+          </code>
+        </pre>
+      </div>
     </div>
   );
 }
