@@ -12,6 +12,9 @@
     top: 50%;
     transform: translate(-50%, -50%);
 }
+.fa-background ~ * {
+    z-index: 100;
+}
 .fa-background-terminal:before {
     content: "\f120";
 }
