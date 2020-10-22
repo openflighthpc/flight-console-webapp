@@ -4,9 +4,10 @@ import FullscreenButton from './FullscreenButton';
 
 function TerminalLayout({
   children,
-  onFullscreenChange,
   onDisconnect,
+  onFullscreenChange,
   onReconnect,
+  onZenChange,
   terminalState,
   title,
 }) {
@@ -27,6 +28,7 @@ function TerminalLayout({
                       onDisconnect={onDisconnect}
                       onFullscreenChange={onFullscreenChange}
                       onReconnect={onReconnect}
+                      onZenChange={onZenChange}
                     />
                   </div>
                 </div>
@@ -47,6 +49,7 @@ function Toolbar({
   onDisconnect,
   onFullscreenChange,
   onReconnect,
+  onZenChange,
   terminalState,
 }) {
   const disconnectBtn = terminalState === 'connected' ? (
@@ -70,7 +73,10 @@ function Toolbar({
   ) : null;
 
   const fullscreenBtn = terminalState === 'connected' ?
-    <FullscreenButton callback={onFullscreenChange} /> :
+    <FullscreenButton
+      onFullscreenChange={onFullscreenChange}
+      onZenChange={onZenChange}
+    /> :
     null;
 
   return (
