@@ -1,10 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Button, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
 import useEventListener from './useEventListener';
 
-function FullscreenButton({ callback }) {
+function FullscreenButton({ onFullscreenChange, onZenChange }) {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const toggleDropdown = () => setDropdownOpen(prevState => !prevState);
   const [isFullscreen, setFullscreen] = useState(false);
-  const callbackRef = useRef(callback);
+  const [isZen, setZen] = useState(false);
+  const fullScreenChangeCallbackRef = useRef(onFullscreenChange);
+  const zenChangeCallbackRef = useRef(onZenChange);
 
   useEventListener(window, 'keydown', function handleKeypress(e) {
     if (!(e.ctrlKey || e.shiftKey || e.altKey) && e.code === "F11") {
@@ -17,13 +22,13 @@ function FullscreenButton({ callback }) {
     document.onfullscreenchange = function ( event ) { 
       if (document.fullscreenElement == null) {
         setFullscreen(false);
-        if (typeof callbackRef.current === 'function') {
-          callbackRef.current(false);
+        if (typeof fullScreenChangeCallbackRef.current === 'function') {
+          fullScreenChangeCallbackRef.current(false);
         }
       } else {
         setFullscreen(true);
-        if (typeof callbackRef.current === 'function') {
-          callbackRef.current(true);
+        if (typeof fullScreenChangeCallbackRef.current === 'function') {
+          fullScreenChangeCallbackRef.current(true);
         }
       }
     }; 
@@ -32,18 +37,73 @@ function FullscreenButton({ callback }) {
     return () => { document.onfullscreenchange = null; };
   }, [setFullscreen]);
 
+  function toggleFullscreen() {
+    if (isFullscreen) {
+      document.exitFullscreen();
+    } else {
+      document.documentElement.requestFullscreen();
+    }
+  }
+
+  function toggleZen() {
+    setZen((prevZen) => {
+      if (prevZen) {
+        document.body.classList.remove('zen-mode');
+        if (typeof zenChangeCallbackRef.current === 'function') {
+          zenChangeCallbackRef.current(false);
+        }
+      } else {
+        document.body.classList.add('zen-mode');
+        if (typeof zenChangeCallbackRef.current === 'function') {
+          zenChangeCallbackRef.current(true);
+        }
+      }
+      return !prevZen;
+    });
+  }
+
+  function defaultAction() {
+    if (isFullscreen) {
+      toggleFullscreen();
+    } else if (isZen) {
+      toggleZen();
+    } else {
+      toggleFullscreen();
+    }
+  }
+
   return (
-    <button
-      className="btn btn-light btn-sm mr-1"
-      onClick={() => {
-        isFullscreen ?
-          document.exitFullscreen() :
-          document.documentElement.requestFullscreen() ;
-      }}
+    <Dropdown
+      className="btn-group mr-1"
+      isOpen={dropdownOpen}
+      toggle={toggleDropdown}
     >
-      <i className={`fa ${isFullscreen ? 'fa-compress' : 'fa-expand'} mr-1`}></i>
-      <span>{isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</span>
-    </button>
+      <Button
+        color="light"
+        size="sm"
+        onClick={defaultAction}
+      >
+        <i className={`fa ${(isFullscreen || isZen) ? 'fa-compress' : 'fa-expand'} mr-1`}></i>
+        <span>
+          {
+            isFullscreen ? 'Exit Fullscreen' : isZen ? 'Exit Zen mode' : 'Fullscreen'
+          }
+        </span>
+      </Button>
+      <DropdownToggle
+        split
+        color="light"
+        size="sm"
+      />
+      <DropdownMenu>
+        <DropdownItem onClick={toggleFullscreen} >
+          { isFullscreen ? 'Exit Fullscreen' : 'Fullscreen' }
+        </DropdownItem>
+        <DropdownItem onClick={toggleZen} >
+          { isZen ? 'Exit Zen mode' : 'Zen mode' }
+        </DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
   );
 }
 

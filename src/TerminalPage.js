@@ -6,7 +6,7 @@ import TerminalLayout from './TerminalLayout';
 
 function TerminalPage() {
   const terminalContainer = useRef(null);
-  const { focus, onDisconnect, onReconnect, terminalState, title } =
+  const { focus, onDisconnect, onReconnect, resizeTerminal, terminalState, title } =
     useTerminal(terminalContainer);
 
   return (
@@ -14,6 +14,7 @@ function TerminalPage() {
       onDisconnect={onDisconnect}
       onFullscreenChange={focus}
       onReconnect={onReconnect}
+      onZenChange={resizeTerminal}
       terminalState={terminalState}
       title={title}
     >

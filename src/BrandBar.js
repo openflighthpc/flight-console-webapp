@@ -9,16 +9,16 @@ import { Context as ConfigContext } from './ConfigContext';
 function BrandBar({ className }) {
   return (
     <nav className={`navbar navbar-expand-lg navbar-light bg-white border-bottom ${className}`}>
-      <Link
+      <a
         className="navbar-brand"
-        to="/"
+        href="/"
       >
         <img
           src={Logo}
           alt="openflightHPC Logo"
           height="75">
         </img>
-      </Link>
+      </a>
 
       <div className="collapse navbar-collapse">
         <ul className="navbar-nav mr-auto">
@@ -44,6 +44,14 @@ function NavItems() {
 
   return (
     <>
+    <li className="nav-item">
+      <Link
+        className="nav-link nav-menu-button"
+        to="/"
+      >
+        Home
+      </Link>
+    </li>
     <li className="nav-item">
       <Link
         className="nav-link nav-menu-button"

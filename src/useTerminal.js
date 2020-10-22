@@ -42,7 +42,7 @@ function useTerminal(containerRef) {
   const [ terminalState, setTerminalState ] = useState('uninitialized');
   const [ title, setTitle ] = useState('');
 
-  useEventListener(window, 'resize', () => {
+  function resizeTerminal() {
     const term = termRef.current;
     const socket = socketRef.current;
     const fitAddon = fitAddonRef.current;
@@ -50,7 +50,9 @@ function useTerminal(containerRef) {
       fitAddon.fit();
       socket.emit('resize', { cols: term.cols, rows: term.rows })
     }
-  });
+  }
+
+  useEventListener(window, 'resize', resizeTerminal);
 
   useEffect(() => {
     if (containerRef.current == null) { return; }
@@ -226,7 +228,7 @@ function useTerminal(containerRef) {
     termRef.current.focus();
   }
 
-  return { focus, onDisconnect, onReconnect, terminalState, title };
+  return { focus, onDisconnect, onReconnect, resizeTerminal, terminalState, title };
 }
 
 function sshErrorToast({ message }) {
