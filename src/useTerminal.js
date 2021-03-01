@@ -5,9 +5,9 @@ import mkDebug from 'debug';
 import { FitAddon } from 'xterm-addon-fit'
 import { Terminal as XTerm } from 'xterm'
 
+import { ConfigContext, useEventListener } from 'flight-webapp-components';
+
 import './Terminal.css';
-import useEventListener from './useEventListener';
-import { Context as ConfigContext } from './ConfigContext';
 import { useInitializeSession } from './api';
 import { useToast } from './ToastContext';
 
@@ -20,8 +20,8 @@ const terminalOptions = {
 };
 
 function buildSocketIOParams(config) {
-  const apiUrl = new URL(config.apiRootUrl);
-  const wsUrl = new URL(config.apiRootUrl);
+  const apiUrl = new URL(config.apiRootUrl, window.location.origin);
+  const wsUrl = new URL(config.apiRootUrl, window.location.origin);
   wsUrl.pathname = '';
   let path = '/ssh/socket.io';
   if (apiUrl.pathname !== '/') {
@@ -205,6 +205,7 @@ function useTerminal(containerRef) {
 
       } else {
         debug('session initialization failed');
+        addToast(sshErrorToast({ message: 'Internal server error' }));
         updateTerminalState(term, 'disconnected');
       }
     })

@@ -1,8 +1,9 @@
-import styled from 'styled-components'
+import styles from './CardParts.module.css';
 
-export const CardFooter = styled.div.attrs(props => ({
-  className: 'card-footer',
-}))`
-  background-color: unset;
-  border-top: unset;
-`;
+export function CardFooter({ children }) {
+  return (
+    <div className={`card-footer ${styles.CardFooter}`}>
+      {children}
+    </div>
+  );
+}

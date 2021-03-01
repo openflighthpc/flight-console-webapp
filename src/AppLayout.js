@@ -1,24 +1,34 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
+import { Redirect, Route } from "react-router-dom";
 
-import AnimatedRouter from './AnimatedRouter';
-import BrandBar from './BrandBar';
-import Footer from './Footer';
+import {
+  AnimatedRouter,
+  AuthenticatedRoute,
+  BrandBar,
+  ConfigContext,
+  Footer,
+} from 'flight-webapp-components';
+
+import NavItems from './NavItems';
+import styles from './AppLayout.module.css';
 import { routes, unconfiguredRoutes } from './routes';
-import { Context as ConfigContext } from './ConfigContext';
 
 function AppLayout() {
   const { unconfigured } = useContext(ConfigContext);
 
   return (
     <>
-    <BrandBar />
+    <BrandBar navItems={<NavItems />} />
     <div
       className="container-fluid"
       id="main"
     >
-      <div id="toast-portal"></div>
+      <div id="toast-portal" className={styles.ToastPortal}></div>
       <div className="content">
         <AnimatedRouter
+          AuthenticatedRoute={AuthenticatedRoute}
+          Redirect={Redirect}
+          Route={Route}
           exact={!unconfigured}
           routes={unconfigured ? unconfiguredRoutes : routes}
           sideNav={SideNav}
@@ -32,7 +42,7 @@ function AppLayout() {
 
 function SideNav() {
   return (
-    <div className="col-sm-2 sidenav"></div>
+    <div className="sidenav col-sm-2"></div>
   );
 }
 

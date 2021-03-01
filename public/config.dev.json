@@ -1,6 +1,3 @@
 {
-  "clusterName": "Console Access Test",
-  "clusterDescription": "Self-managed in-cloud openflightHPC Cluster.  Console access.",
-  "clusterLogo": "https://s3.eu-west-2.amazonaws.com/alces-flight-center/logos/Alces_flight_logo_horiz.png",
-  "apiRootUrl": "http://localhost:2222"
+  "apiRootUrl": "/console/api/v0"
 }
