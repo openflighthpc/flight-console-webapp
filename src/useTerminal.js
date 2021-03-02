@@ -5,11 +5,12 @@ import mkDebug from 'debug';
 import { FitAddon } from 'xterm-addon-fit'
 import { Terminal as XTerm } from 'xterm'
 
-import { ConfigContext, useEventListener } from 'flight-webapp-components';
+import { ConfigContext, useEventListener, utils } from 'flight-webapp-components';
 
 import './Terminal.css';
 import { useInitializeSession } from './api';
 import { useToast } from './ToastContext';
+import { missingSSHConfigurationToast } from './InstallSshConfiguration';
 
 const debug = mkDebug('flight:Terminal');
 const terminalOptions = {
@@ -96,7 +97,7 @@ function useTerminal(containerRef) {
   function connect() {
     const term = termRef.current;
     debug('initializing session');
-    initializeSession().then(() => {
+    initializeSession().then((responseBody) => {
       if (response.ok) {
         const [ url, params ] = buildSocketIOParams(config);
         debug('initializing socket: %s %o', url, params);
@@ -204,9 +205,16 @@ function useTerminal(containerRef) {
         });
 
       } else {
-        debug('session initialization failed');
-        addToast(sshErrorToast({ message: 'Internal server error' }));
-        updateTerminalState(term, 'disconnected');
+        const code = utils.errorCode(responseBody);
+        if ( code === 'Missing SSH Configuration' ) {
+          debug('session missing SSH configuration');
+          addToast(missingSSHConfigurationToast(onReconnect));
+          updateTerminalState(term, 'disconnected');
+        } else {
+          debug('session initialization failed');
+          addToast(sshErrorToast({ message: code || 'Unexpected error' }));
+          updateTerminalState(term, 'disconnected');
+        }
       }
     })
   }

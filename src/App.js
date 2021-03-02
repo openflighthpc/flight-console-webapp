@@ -19,12 +19,12 @@ function App() {
           <ConfigProvider>
             <Router basename={process.env.REACT_APP_MOUNT_PATH}>
               <CurrentUserProvider>
-                <Toast.Provider>
-                  <Toast.Container />
-                  <FetchProvider>
+                <FetchProvider>
+                  <Toast.Provider>
+                    <Toast.Container />
                     <AppLayout />
-                  </FetchProvider>
-                </Toast.Provider>
+                  </Toast.Provider>
+                </FetchProvider>
               </CurrentUserProvider>
             </Router>
           </ConfigProvider>
