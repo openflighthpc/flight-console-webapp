@@ -1,6 +1,4 @@
-import React from 'react';
-
-import FullscreenButton from './FullscreenButton';
+import { FullscreenButton } from 'flight-webapp-components';
 
 function TerminalLayout({
   children,

@@ -1,18 +1,11 @@
 import React from 'react';
 
-import Logo from './png_trans_logo.png';
+import { DashboardLogo } from 'flight-webapp-components';
 
 function UnconfiguredDashboard() {
   return (
     <div>
-      <img
-        src={Logo}
-        alt="OpenflightHPC Logo"
-        className="center"
-        width="100%"
-      >
-      </img>
-
+      <DashboardLogo />
       <p>
         Flight Console Service allows you to access an interactive terminal
         console session running on your cluster from the comfort of your
