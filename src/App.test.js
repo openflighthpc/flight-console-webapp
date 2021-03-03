@@ -1,9 +1,17 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
-  const { getByText } = render(<App />);
-  const linkElement = getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+async function renderApp() {
+  const utils = render(<App />);
+  expect(utils.getByText('Loading...')).toBeInTheDocument();
+  await waitFor(
+    () => expect(utils.queryByText('Loading...')).toBeNull()
+  );
+  return utils;
+}
+
+test('renders without crashing', async () => {
+  const { queryByText } = await renderApp();
+  expect(queryByText('An error has occurred')).toBeNull();
 });
