@@ -84,7 +84,7 @@ get_current_version() {
 }
 
 get_new_version() {
-    if [ -z "${VERSION}" ] ; then
+    if [ -n "${VERSION}" ] ; then
         echo "${VERSION}"
     elif $BUMP_VERSION ; then
         get_current_version \
