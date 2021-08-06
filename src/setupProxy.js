@@ -1,43 +1,43 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 module.exports = function(app) {
-  // Proxy requests to the console api.
-  app.use(
-    '/console/api/v0',
-    createProxyMiddleware({
-      target: 'http://localhost:6312',
-      changeOrigin: false,
-      pathRewrite: {
-        '^/console/api/v0': '/', // Remove base path.
-      },
-      logLevel: 'debug',
-    })
-  );
+  if (process.env.REACT_APP_PROXY_API === "true") {
+    // Proxy requests to the desktop api.
+    const rewriteFrom = process.env.REACT_APP_PROXY_API_PATH_REWRITE_FROM ||
+      '^/dev/console/api';
+    const rewriteTo = process.env.REACT_APP_PROXY_API_PATH_REWRITE_TO ||
+      '/';
 
-  // Proxy requests to the login api.
-  app.use(
-    '/login/api/v0',
-    createProxyMiddleware({
-      target: 'http://localhost:6311',
-      changeOrigin: false,
-      pathRewrite: {
-        '^/login/api/': '/', // Remove base path.
-      },
-      logLevel: 'debug',
-    })
-  );
+    app.use(
+      process.env.REACT_APP_PROXY_API_PATH || '/dev/console/api',
+      createProxyMiddleware({
+        target: process.env.REACT_APP_PROXY_API_URL || 'http://localhost:6309',
+        changeOrigin: false,
+        pathRewrite: {
+          [rewriteFrom]: rewriteTo,
+        },
+        logLevel: 'debug',
+      })
+    );
+  }
 
-  // Proxy requests to the landing page.
-  app.use(
-    [
-      '/data/',
-      '/styles/branding.css',
-    ],
-    createProxyMiddleware({
-      target: 'http://localhost:3001',
-      changeOrigin: false,
-      logLevel: 'debug',
-    })
-  );
+  if (process.env.REACT_APP_PROXY_LOGIN_API === "true") {
+    // Proxy requests to the login api.
+    const rewriteFrom = process.env.REACT_APP_PROXY_LOGIN_API_PATH_REWRITE_FROM ||
+      '^/dev/login/api';
+    const rewriteTo = process.env.REACT_APP_PROXY_LOGIN_API_PATH_REWRITE_TO ||
+      '/';
+
+    app.use(
+      process.env.REACT_APP_PROXY_LOGIN_API_PATH || '/dev/login/api/v0',
+      createProxyMiddleware({
+        target: process.env.REACT_APP_PROXY_LOGIN_API_URL || 'http://localhost:6311',
+        changeOrigin: false,
+        pathRewrite: {
+          [rewriteFrom]: rewriteTo,
+        },
+        logLevel: 'debug',
+      })
+    );
+  }
 };
-
