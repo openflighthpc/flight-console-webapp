@@ -8,11 +8,10 @@ PACKAGE_NAME=$(cat "${REPO_ROOT}/package.json" | jq -r .name )
 
 main() {
     parse_arguments "$@"
+    validate_arguments
     header "Checking repo is clean"
     abort_if_uncommitted_changes_present
     abort_if_not_uptodate_with_remotes
-    # header "Checking version"
-    # abort_if_new_version_exists
     subheader "Creating release branch"
     checkout_release_branch
     if $BUMP_VERSION ; then
@@ -69,23 +68,14 @@ abort_if_not_uptodate_with_remote() {
     fi
 }
 
-# abort_if_new_version_exists() {
-#     local new_version
-#     new_version=$(get_new_version)
-#     if aws s3 ls s3://${BUCKET_PREFIX}/${new_version} ; then
-#         echo "Version ${new_version} already exits on AWS"
-#         exit 6
-#     fi
-# }
-
 get_current_version() {
     cat package.json \
         | jq -r .version
 }
 
 get_new_version() {
-    if [ -n "${VERSION}" ] ; then
-        echo "${VERSION}"
+    if [ -n "${NEW_VERSION}" ] ; then
+        echo "${NEW_VERSION}"
     elif $BUMP_VERSION ; then
         get_current_version \
             | awk 'BEGIN { FS="." } { print $1 "." $2 "." $3 + 1 }'
@@ -136,13 +126,13 @@ usage() {
     echo
     echo "Build, tag and release a new version of ${PACKAGE_NAME}"
     echo
-    echo -e "      --version\tBump to given version"
+    echo -e "      --version=VERSION\tBump to version number VERSION"
     echo -e "      --skip-version-bump\tDon't bump the version number"
     echo -e "      --help\t\t\tShow this help message"
 }
 
 BUMP_VERSION=true
-VERSION=
+NEW_VERSION=
 
 parse_arguments() {
     while [[ $# > 0 ]] ; do
@@ -160,8 +150,8 @@ parse_arguments() {
                 ;;
 
             --version)
-                BUMP_VERSION=false
-                VERSION="$2"
+                BUMP_VERSION=true
+                NEW_VERSION="$2"
                 shift
                 shift
                 ;;
@@ -173,6 +163,14 @@ parse_arguments() {
                 ;;
         esac
     done
+}
+
+validate_arguments() {
+    if [ "${BUMP_VERSION}" == "false" -a "${NEW_VERSION}" != "" ]; then
+        echo "$(basename $0): cannot give both --version and --skip-version-bump"
+        usage
+        exit 1
+    fi
 }
 
 main "$@"
