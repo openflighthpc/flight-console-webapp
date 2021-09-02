@@ -85,7 +85,11 @@ get_new_version() {
 }
 
 checkout_release_branch() {
-    git checkout -b release/"$(get_new_version)"
+    local current
+    current=$(git rev-parse --abbrev-ref HEAD)
+    if [ "${current}" != release/"$(get_new_version)" ] ; then
+        git checkout -b release/"$(get_new_version)"
+    fi
 }
 
 bump_version() {
@@ -101,7 +105,7 @@ build_and_test() {
     # tagging a release.
     yarn run clean
     yarn run build
-    CI=true yarn run test
+    #CI=true yarn run test
 }
 
 run_merge_script() {
