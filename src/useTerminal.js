@@ -258,33 +258,61 @@ function addBasicErrorToast(responseBody, addToast) {
       The change directory feature has been disabled.
     </p>
   )
-  let body = (
-    <div>
-      <p>
-        Unfortunately there has been a problem connecting to your terminal
-        console session.  Please try again and, if problems persist, help us
-        to more quickly rectify the problem by contacting us and letting us
-        know.
-      </p>
-      {limitedFeatures}
-    </div>
+  let message = (
+    <p>
+      Unfortunately there has been a problem connecting to your terminal
+      console session.  Please try again and, if problems persist, help us
+      to more quickly rectify the problem by contacting us and letting us
+      know.
+    </p>
   );
 
   // Update the error for SFTP errors
   if (code === 'Unexpected SFTP STDOUT') {
     debug("user's terminal emitted data to STDOUT in a non-interactive shell");
-    body = (
-      <div>
-        <p>
-          Unfortunately there has been a problem when polling your shell for
-          its current directory. This is typically because a profile script
-          (e.g. <code>.bashrc</code>) has printed to Standard Output within
-          a <i>non-interactive login shell</i>.
-        </p>
-        {limitedFeatures}
-      </div>
+    message = (
+      <p>
+        Unfortunately there has been a problem when polling your shell for
+        its current directory. This is typically because a profile script
+        (e.g. <code>.bashrc</code>) has printed to Standard Output within
+        a <i>non-interactive login shell</i>.
+      </p>
     );
+  } else if (code === "Missing Directory") {
+    message = (
+      <p>
+        Cannot open the requested directory as it does not exist!
+      </p>
+    )
+  } else if (code === "Not A Directory") {
+    message = (
+      <p>
+        Cannot open the requested directory as it is not a directory!
+      </p>
+    )
+  } else if (code === "Permission Denied") {
+    message = (
+      <p>
+        You have insufficient permissions to open the requested directory!
+      </p>
+    );
+  } else if (code === "Invalid Characters") {
+    message = (
+      <p>
+        Cannot open the requested directory as it contains invalid
+        characters. Please contact us if your believe this to be an
+        error.
+      </p>
+    )
   }
+
+  // Generate the message
+  const body = (
+    <p>
+      {message}
+      {limitedFeatures}
+    </p>
+  );
 
   // Display the toast
   addToast({
