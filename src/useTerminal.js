@@ -98,7 +98,16 @@ function useTerminal(containerRef) {
     const term = termRef.current;
     debug('initializing session');
     initializeSession().then((responseBody) => {
-      if (response.ok) {
+      // Prompts the user if a basic error has occurred
+      // and continues with the connection
+      const basic_error = response.status === 422 && response.data.errors.every((e) => {
+        return e.basic
+      })
+      if (basic_error) {
+        addBasicErrorToast(responseBody, addToast);
+      }
+
+      if (response.ok || basic_error) {
         const [ url, params ] = buildSocketIOParams(config);
         debug('initializing socket: %s %o', url, params);
         const socket = io.connect(url, params);
@@ -238,6 +247,52 @@ function useTerminal(containerRef) {
   }
 
   return { focus, onDisconnect, onReconnect, resizeTerminal, terminalState, title };
+}
+
+function addBasicErrorToast(responseBody, addToast) {
+  const code = utils.errorCode(responseBody);
+
+  // Define the default message
+  const limitedFeatures = (
+    <p>
+      The change directory feature has been disabled.
+    </p>
+  )
+  let body = (
+    <div>
+      <p>
+        Unfortunately there has been a problem connecting to your terminal
+        console session.  Please try again and, if problems persist, help us
+        to more quickly rectify the problem by contacting us and letting us
+        know.
+      </p>
+      {limitedFeatures}
+    </div>
+  );
+
+  // Update the error for SFTP errors
+  if (code === 'Unexpected SFTP STDOUT') {
+    debug("user's terminal emitted data to STDOUT in a non-interactive shell");
+    body = (
+      <div>
+        <p>
+          Unfortunately there has been a problem when polling your shell for
+          its current directory. This is typically because a profile script
+          (e.g. <code>.bashrc</code>) has printed to Standard Output within
+          a <i>non-interactive login shell</i>.
+        </p>
+        {limitedFeatures}
+      </div>
+    );
+  }
+
+  // Display the toast
+  addToast({
+    body,
+    icon: 'warning',
+    header: 'Limited Connection',
+  });
+  return;
 }
 
 function sshErrorToast({ message }) {
