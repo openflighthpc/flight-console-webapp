@@ -8,9 +8,10 @@ import { Terminal as XTerm } from 'xterm'
 import { ConfigContext, useEventListener, utils } from 'flight-webapp-components';
 
 import './Terminal.css';
+import useRequestedDirectory from './useRequestedDirectory';
+import { missingSSHConfigurationToast } from './InstallSshConfiguration';
 import { useInitializeSession } from './api';
 import { useToast } from './ToastContext';
-import { missingSSHConfigurationToast } from './InstallSshConfiguration';
 
 const debug = mkDebug('flight:Terminal');
 const terminalOptions = {
@@ -37,7 +38,8 @@ function useTerminal(containerRef) {
   const termRef = useRef(null);
   const fitAddonRef = useRef(null);
   const socketRef = useRef(null);
-  const { get: initializeSession, response } = useInitializeSession();
+  const { requestedDir } = useRequestedDirectory();
+  const { get: initializeSession, response } = useInitializeSession(requestedDir);
   const { addToast } = useToast();
   // Possible states are `uninitialized`, `connected`, `disconnected`.
   const [ terminalState, setTerminalState ] = useState('uninitialized');
@@ -72,7 +74,7 @@ function useTerminal(containerRef) {
     fitAddon.fit()
     connect();
 
-    return function disponse() {
+    return function dispose() {
       debug('disposing');
       if (socketRef.current) {
         socketRef.current.disconnect();
@@ -100,14 +102,14 @@ function useTerminal(containerRef) {
     initializeSession().then((responseBody) => {
       // Prompts the user if a basic error has occurred
       // and continues with the connection
-      const basic_error = response.status === 422 && response.data.errors.every((e) => {
-        return e.basic
+      const basicError = response.status === 422 && response.data.errors.every((e) => {
+        return e.basic;
       })
-      if (basic_error) {
-        addBasicErrorToast(responseBody, addToast);
+      if (basicError) {
+        addBasicErrorToast(responseBody, requestedDir, addToast);
       }
 
-      if (response.ok || basic_error) {
+      if (response.ok || basicError) {
         const [ url, params ] = buildSocketIOParams(config);
         debug('initializing socket: %s %o', url, params);
         const socket = io.connect(url, params);
@@ -249,55 +251,61 @@ function useTerminal(containerRef) {
   return { focus, onDisconnect, onReconnect, resizeTerminal, terminalState, title };
 }
 
-function addBasicErrorToast(responseBody, addToast) {
+function addBasicErrorToast(responseBody, requestedDir, addToast) {
   const code = utils.errorCode(responseBody);
 
-  // Define the default message
-  const limitedFeatures = (
-    <p>
-      The change directory feature has been disabled.
-    </p>
-  )
-  let message = (
-    <p>
-      Unfortunately there has been a problem connecting to your terminal
-      console session.  Please try again and, if problems persist, help us
-      to more quickly rectify the problem by contacting us and letting us
-      know.
-    </p>
-  );
-
-  // Update the error for SFTP errors
-  if (code === 'Unexpected SFTP STDOUT') {
-    debug("user's terminal emitted data to STDOUT in a non-interactive shell");
-    message = (
+  let body;
+  if (code === 'Unexpected SFTP STDOUT' && requestedDir == null) {
+    // An initial directory hasn't been requested, but it won't work if they
+    // ever do.
+    body = (
+      <>
       <p>
-        Unfortunately there has been a problem when polling your shell for
-        its current directory. This is typically because a profile script
-        (e.g. <code>.bashrc</code>) has printed to Standard Output within
-        a <i>non-interactive login shell</i>.
+        We have detected that your current shell setup does not support
+        setting the initial directory.  This means that links to OpenFlight
+        Console from other OpenFlight Websuite applications may not work.
       </p>
+      <p>
+        This is typically because a profile script (e.g.{' '}
+        <code>.bashrc</code>) has printed to Standard Output within a{' '}
+        <i>non-interactive login shell</i>.
+      </p>
+      </>
+    );
+  } else if (code === 'Unexpected SFTP STDOUT') {
+    body = (
+      <>
+      <p>
+        Cannot open the requested directory as your current shell setup does
+        not support setting the initial directory.
+      </p>
+      <p>
+        This is typically because a profile script (e.g.{' '}
+        <code>.bashrc</code>) has printed to Standard Output within a{' '}
+        <i>non-interactive login shell</i>.
+      </p>
+      </>
     );
   } else if (code === "Missing Directory") {
-    message = (
+    body = (
       <p>
         Cannot open the requested directory as it does not exist!
       </p>
     )
   } else if (code === "Not A Directory") {
-    message = (
+    body = (
       <p>
         Cannot open the requested directory as it is not a directory!
       </p>
     )
   } else if (code === "Permission Denied") {
-    message = (
+    body = (
       <p>
         You have insufficient permissions to open the requested directory!
       </p>
     );
   } else if (code === "Invalid Characters") {
-    message = (
+    body = (
       <p>
         Cannot open the requested directory as it contains invalid
         characters. Please contact us if your believe this to be an
@@ -306,21 +314,13 @@ function addBasicErrorToast(responseBody, addToast) {
     )
   }
 
-  // Generate the message
-  const body = (
-    <p>
-      {message}
-      {limitedFeatures}
-    </p>
-  );
-
-  // Display the toast
-  addToast({
-    body,
-    icon: 'warning',
-    header: 'Limited Connection',
-  });
-  return;
+  if (body) {
+    addToast({
+      body,
+      icon: 'warning',
+      header: 'Initial directory switching disabled',
+    });
+  }
 }
 
 function sshErrorToast({ message }) {
