@@ -100,16 +100,14 @@ function useTerminal(containerRef) {
     const term = termRef.current;
     debug('initializing session');
     initializeSession().then((responseBody) => {
-      // Prompts the user if a basic error has occurred
-      // and continues with the connection
-      const basicError = response.status === 422 && response.data.errors.every((e) => {
-        return e.basic;
+      const recoverable = response.status === 422 && response.data.errors.every((e) => {
+        return e.recoverable;
       })
-      if (basicError) {
-        addBasicErrorToast(responseBody, requestedDir, addToast);
+      if (recoverable) {
+        addRecoverableToast(responseBody, requestedDir, addToast);
       }
 
-      if (response.ok || basicError) {
+      if (response.ok || recoverable) {
         const [ url, params ] = buildSocketIOParams(config);
         debug('initializing socket: %s %o', url, params);
         const socket = io.connect(url, params);
@@ -251,7 +249,7 @@ function useTerminal(containerRef) {
   return { focus, onDisconnect, onReconnect, resizeTerminal, terminalState, title };
 }
 
-function addBasicErrorToast(responseBody, requestedDir, addToast) {
+function addRecoverableToast(responseBody, requestedDir, addToast) {
   const code = utils.errorCode(responseBody);
 
   let body;
