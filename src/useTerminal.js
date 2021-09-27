@@ -8,9 +8,10 @@ import { Terminal as XTerm } from 'xterm'
 import { ConfigContext, useEventListener, utils } from 'flight-webapp-components';
 
 import './Terminal.css';
+import useRequestedDirectory from './useRequestedDirectory';
+import { missingSSHConfigurationToast } from './InstallSshConfiguration';
 import { useInitializeSession } from './api';
 import { useToast } from './ToastContext';
-import { missingSSHConfigurationToast } from './InstallSshConfiguration';
 
 const debug = mkDebug('flight:Terminal');
 const terminalOptions = {
@@ -37,7 +38,8 @@ function useTerminal(containerRef) {
   const termRef = useRef(null);
   const fitAddonRef = useRef(null);
   const socketRef = useRef(null);
-  const { get: initializeSession, response } = useInitializeSession();
+  const { requestedDir } = useRequestedDirectory();
+  const { get: initializeSession, response } = useInitializeSession(requestedDir);
   const { addToast } = useToast();
   // Possible states are `uninitialized`, `connected`, `disconnected`.
   const [ terminalState, setTerminalState ] = useState('uninitialized');
@@ -72,7 +74,7 @@ function useTerminal(containerRef) {
     fitAddon.fit()
     connect();
 
-    return function disponse() {
+    return function dispose() {
       debug('disposing');
       if (socketRef.current) {
         socketRef.current.disconnect();
@@ -98,7 +100,14 @@ function useTerminal(containerRef) {
     const term = termRef.current;
     debug('initializing session');
     initializeSession().then((responseBody) => {
-      if (response.ok) {
+      const recoverable = response.status === 422 && response.data.errors.every((e) => {
+        return e.recoverable;
+      })
+      if (recoverable) {
+        addRecoverableToast(responseBody, requestedDir, addToast);
+      }
+
+      if (response.ok || recoverable) {
         const [ url, params ] = buildSocketIOParams(config);
         debug('initializing socket: %s %o', url, params);
         const socket = io.connect(url, params);
@@ -238,6 +247,78 @@ function useTerminal(containerRef) {
   }
 
   return { focus, onDisconnect, onReconnect, resizeTerminal, terminalState, title };
+}
+
+function addRecoverableToast(responseBody, requestedDir, addToast) {
+  const code = utils.errorCode(responseBody);
+
+  let body;
+  if (code === 'Unexpected SFTP STDOUT' && requestedDir == null) {
+    // An initial directory hasn't been requested, but it won't work if they
+    // ever do.
+    body = (
+      <>
+      <p>
+        We have detected that your current shell setup does not support
+        setting the initial directory.  This means that links to OpenFlight
+        Console from other OpenFlight Websuite applications may not work.
+      </p>
+      <p>
+        This is typically because a profile script (e.g.{' '}
+        <code>.bashrc</code>) has printed to Standard Output within a{' '}
+        <i>non-interactive login shell</i>.
+      </p>
+      </>
+    );
+  } else if (code === 'Unexpected SFTP STDOUT') {
+    body = (
+      <>
+      <p>
+        Cannot open the requested directory as your current shell setup does
+        not support setting the initial directory.
+      </p>
+      <p>
+        This is typically because a profile script (e.g.{' '}
+        <code>.bashrc</code>) has printed to Standard Output within a{' '}
+        <i>non-interactive login shell</i>.
+      </p>
+      </>
+    );
+  } else if (code === "Missing Directory") {
+    body = (
+      <p>
+        Cannot open the requested directory as it does not exist!
+      </p>
+    )
+  } else if (code === "Not A Directory") {
+    body = (
+      <p>
+        Cannot open the requested directory as it is not a directory!
+      </p>
+    )
+  } else if (code === "Permission Denied") {
+    body = (
+      <p>
+        You have insufficient permissions to open the requested directory!
+      </p>
+    );
+  } else if (code === "Invalid Characters") {
+    body = (
+      <p>
+        Cannot open the requested directory as it contains invalid
+        characters. Please contact us if your believe this to be an
+        error.
+      </p>
+    )
+  }
+
+  if (body) {
+    addToast({
+      body,
+      icon: 'warning',
+      header: 'Initial directory switching disabled',
+    });
+  }
 }
 
 function sshErrorToast({ message }) {
