@@ -1,8 +1,5 @@
 import classNames from 'classnames';
-import {
-  ClusterLogo ,
-  useEnvironment,
-} from 'flight-webapp-components';
+import { useEnvironment } from 'flight-webapp-components';
 
 import styles from './ClusterOverview.module.css';
 
@@ -15,10 +12,9 @@ function ClusterOverview({ className }) {
 
   return (
     <div className={classNames(className)}>
-      <div className="text-center mb-3">
+      <div className="text-center">
         <ClusterName>{environment('environment.name')}</ClusterName>
       </div>
-      <ClusterLogo />
     </div>
   );
 }
