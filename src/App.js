@@ -12,8 +12,6 @@ import {
 import * as Toast from './ToastContext';
 import AppLayout from './AppLayout';
 
-console.log('DataProvider:', DataProvider);  // eslint-disable-line no-console
-
 function App() {
   return (
     <div className="App">

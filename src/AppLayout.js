@@ -14,9 +14,6 @@ import NavItems from './NavItems';
 import styles from './AppLayout.module.css';
 import { routes, unconfiguredRoutes } from './routes';
 
-console.log('BrandBar:', BrandBar);  // eslint-disable-line no-console
-console.log('process.env.REACT_APP_DATA_FILE:', process.env.REACT_APP_DATA_FILE);  // eslint-disable-line no-console
-
 function AppLayout() {
   const { unconfigured } = useContext(ConfigContext);
 
