@@ -1,6 +1,6 @@
 {
   "name": "flight-console-webapp",
-  "version": "1.4.0-rc2",
+  "version": "1.4.0",
   "private": true,
   "dependencies": {
     "debug": "^4.3.1",
