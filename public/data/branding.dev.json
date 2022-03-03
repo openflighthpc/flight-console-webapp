@@ -1,4 +1,7 @@
 {
+  "copyright": {
+    "text": "openflightHPC"
+  },
   "brandbar": {
     "logo": {
       "url": "/dev/console/images/bigv-uni-50x50.png",
