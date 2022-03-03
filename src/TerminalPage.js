@@ -21,7 +21,7 @@ function TerminalPage() {
       <div
         id="terminal-container"
         className={
-          classNames("terminal full-height", {
+          classNames("terminal fullscreen-content", {
             'terminal-connected': terminalState === 'connected',
             'terminal-disconnected': terminalState !== 'connected',
           })
