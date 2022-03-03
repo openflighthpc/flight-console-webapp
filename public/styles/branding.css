@@ -29,6 +29,9 @@ body {
 .branding-brandbar-text { }
 .branding-brandbar-logo img { }
 
+.navbar.brandbar .navbar-nav-container {
+    justify-content: space-between;
+}
 .navbar {
     border-bottom: 1px solid #dee2e6;
 }
@@ -74,6 +77,13 @@ body {
 .productbar .nav-item.active,
 .productbar .nav-item .nav-link.active {
     /* color: #fff; */
+}
+
+.App .brandbar.brandbar-combined {
+    display: none;
+}
+.App .brandbar:not(.brandbar-combined),
+.App .productbar {
 }
 
 /*------------------------------------------------
@@ -140,6 +150,12 @@ img.logo {
  * ----------------------------------------------- */
 .branding-landingpage-dashboard-logo-wrapper { }
 img.branding-landingpage-dashboard-logo { }
+
+.blurb .powered-by {
+    color: #999;
+    font-size: 18px;
+    text-align: center;
+}
 
 /* -----------------------------------------------
  * App branding
