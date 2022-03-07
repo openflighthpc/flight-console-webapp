@@ -21,6 +21,7 @@ main() {
     fi
     header "Building"
     build_and_test
+    abort_if_uncommitted_changes_present
     header "Merging, tagging, and pushing"
     run_merge_script
 }
