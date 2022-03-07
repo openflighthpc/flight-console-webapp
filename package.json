@@ -1,6 +1,6 @@
 {
   "name": "flight-console-webapp",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
   "dependencies": {
     "debug": "^4.3.3",
@@ -44,7 +44,8 @@
     "@testing-library/user-event": "^13.5.0",
     "http-proxy-middleware": "^2.0.3",
     "jest-fetch-mock": "^3.0.3",
-    "jest-junit": "^13.0.0"
+    "jest-junit": "^13.0.0",
+    "postcss-normalize": "^10.0.1"
   },
   "jest-junit": {
     "suiteName": "jest tests",
