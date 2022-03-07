@@ -3,9 +3,9 @@ import useFetch from 'use-http';
 export function useInitializeSession(dir) {
   let path
   if (dir) {
-    path = `/ssh/host/127.0.0.1?dir=${dir}`;
+    path = `/ssh/host?dir=${dir}`;
   } else {
-    path = "/ssh/host/127.0.0.1";
+    path = "/ssh/host";
   }
 
   return useFetch(path);
