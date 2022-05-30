@@ -1,7 +1,7 @@
 import React from 'react';
-
 import { DashboardLogo } from 'flight-webapp-components';
 
+import Blurb from './Blurb';
 import ClusterOverview from './ClusterOverview';
 
 function UnauthenticatedDashboard() {
@@ -9,12 +9,7 @@ function UnauthenticatedDashboard() {
     <div>
       <DashboardLogo />
       <ClusterOverview className="mt-2 mb-2" />
-      <p>
-        Flight Console Service allows you to access an interactive terminal
-        console session running on your cluster from the comfort of your
-        browser.
-      </p>
-
+      <Blurb />
       <p>
         To start interacting with your console and gain access to your HPC
         environment sign in above.
@@ -22,6 +17,5 @@ function UnauthenticatedDashboard() {
     </div>
   );
 }
-
 
 export default UnauthenticatedDashboard;
