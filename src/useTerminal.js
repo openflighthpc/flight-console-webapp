@@ -51,6 +51,7 @@ function useTerminal(containerRef) {
     const fitAddon = fitAddonRef.current;
     if (term != null && socket != null && fitAddon != null) {
       fitAddon.fit();
+      debug('resizing terminal: %s %s', term.cols, term.rows);
       socket.emit('resize', { cols: term.cols, rows: term.rows })
     }
   }
@@ -60,6 +61,7 @@ function useTerminal(containerRef) {
   useEffect(() => {
     if (containerRef.current == null) { return; }
 
+    debug('initializing terminal');
     const term = new XTerm();
     const fitAddon = new FitAddon();
     termRef.current = term;
@@ -99,7 +101,7 @@ function useTerminal(containerRef) {
   function connect() {
     const term = termRef.current;
     debug('initializing session');
-    initializeSession().then((responseBody) => {
+    return initializeSession().then((responseBody) => {
       const recoverable = response.status === 422 && response.data.errors.every((e) => {
         return e.recoverable;
       })
@@ -123,8 +125,21 @@ function useTerminal(containerRef) {
         })
 
         socket.on('connect', function () {
-          socket.emit('geometry', term.cols, term.rows)
+          debug('socket connected');
         })
+
+        // Wait until the socket and its SSH connection/shell hit known states
+        // and then configure the shell geometry.
+        socket.on('status', function (data) {
+          debug('status %s', data);
+          if (data.startsWith('SOCKET CONFIGURED')) {
+            debug('emitting geometry: cols=%d rows=%d', term.cols, term.rows);
+            socket.emit('geometry', term.cols, term.rows);
+          }
+          if (data.startsWith('SSH SHELL ESTABLISHED')) {
+            resizeTerminal();
+          }
+        });
 
         socket.on('shutdownCountdownUpdate', function (secondsRemaining) {
           // XXX Do something here.
@@ -184,11 +199,6 @@ function useTerminal(containerRef) {
         })
 
         socket.on('disconnect', function (err) {
-          // if (!errorExists) {
-          //   status.style.backgroundColor = 'red'
-          //   status.innerHTML =
-          //     'WEBSOCKET SERVER DISCONNECTED: ' + err
-          // }
           debug('socket disconnected: %s', err);
           socket.io.reconnection(false);
           updateTerminalState(term, 'disconnected');
@@ -238,6 +248,7 @@ function useTerminal(containerRef) {
   function onReconnect() {
     debug('reconnecting');
     termRef.current.reset();
+    if (fitAddonRef.current != null) { fitAddonRef.current.fit(); }
     connect();
     termRef.current.focus();
   }
