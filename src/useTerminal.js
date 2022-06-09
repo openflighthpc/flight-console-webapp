@@ -207,8 +207,8 @@ function useTerminal(containerRef) {
         socket.on('error', function (err) {
           // There has been an error with the socket.  This is a transport
           // error not an application error.
-          debug('socket error: %s', err);
-          addToast(sshErrorToast({ message: err }));
+          debug('socket error: %s', err.toString());
+          addToast(sshErrorToast(err));
           updateTerminalState(term, 'error');
         })
 
