@@ -38,6 +38,7 @@ function useTerminal(containerRef) {
   const termRef = useRef(null);
   const fitAddonRef = useRef(null);
   const socketRef = useRef(null);
+  const shutdownMessageShown = useRef(false);
   const { requestedDir } = useRequestedDirectory();
   const { get: initializeSession, response } = useInitializeSession(requestedDir);
   const { addToast } = useToast();
@@ -142,8 +143,11 @@ function useTerminal(containerRef) {
         });
 
         socket.on('shutdownCountdownUpdate', function (secondsRemaining) {
-          // XXX Do something here.
-          console.log('secondsRemaining:', secondsRemaining);  // eslint-disable-line no-console
+          debug('server is shutting down in %s seconds', secondsRemaining);
+          if (!shutdownMessageShown.current) {
+            shutdownMessageShown.current = true;
+            addToast(serverShutdownToast({ secondsRemaining }));
+          }
         });
 
         socket.on('ssherror', function (data) {
@@ -207,8 +211,8 @@ function useTerminal(containerRef) {
         socket.on('error', function (err) {
           // There has been an error with the socket.  This is a transport
           // error not an application error.
-          debug('socket error: %s', err);
-          addToast(sshErrorToast({ message: err }));
+          debug('socket error: %s', err.toString());
+          addToast(sshErrorToast(err));
           updateTerminalState(term, 'error');
         })
 
@@ -351,6 +355,27 @@ function sshErrorToast({ message }) {
     body,
     icon: 'danger',
     header: 'Connection failed',
+  };
+}
+
+function serverShutdownToast({ secondsRemaining }) {
+  let body = (
+    <div>
+      <p>
+        The Flight Console API will shutdown shortly.  Please save your work
+        as your terminal session will terminate when the server is shutdown.
+      </p>
+      <p>
+        When the Flight Console API has restarted you can click the
+        "Reconnect" button to start a new terminal session.
+      </p>
+    </div>
+  );
+
+  return {
+    body,
+    icon: 'danger',
+    header: 'Console API shutting down',
   };
 }
 
