@@ -115,6 +115,7 @@ function useTerminal(containerRef) {
         debug('initializing socket: %s %o', url, params);
         const socket = io.connect(url, params);
         socketRef.current = socket;
+        shutdownMessageShown.current = false;
         updateTerminalState(term, 'connected');
 
         term.onData(function (data) {
