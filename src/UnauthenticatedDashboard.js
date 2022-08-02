@@ -12,7 +12,8 @@ function UnauthenticatedDashboard() {
       <Blurb />
       <p>
         To start interacting with your console and gain access to your HPC
-        environment sign in above.
+        environment you will need to login by clicking the "Log in" button
+        above.
       </p>
     </div>
   );
