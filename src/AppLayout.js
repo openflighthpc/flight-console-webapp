@@ -37,6 +37,7 @@ function AppLayout() {
           routes={unconfigured ? unconfiguredRoutes : routes}
           sideNav={SideNav}
           useLocation={useLocation}
+          fullscreen={true}
         />
       </div>
     </div>
