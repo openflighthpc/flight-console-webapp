@@ -1,37 +1,34 @@
-import { Link } from "react-router-dom";
-import { DashboardLogo } from 'flight-webapp-components';
+import classNames from "classnames";
+import {useRef} from "react";
 
-import Blurb from './Blurb';
-import { CardFooter } from './CardParts';
+import useTerminal from "./useTerminal";
+import TerminalLayout from "./TerminalLayout";
 
 function AuthenticatedDashboard() {
+  const terminalContainer = useRef(null);
+  const { focus, onDisconnect, onReconnect, resizeTerminal, terminalState, title } =
+    useTerminal(terminalContainer);
+
   return (
-    <div>
-      <DashboardLogo />
-      <Blurb />
-      <div className="card-deck">
-        <div className="card">
-          <div className="card-body fa-background fa-background-terminal">
-            <h5 className="card-title text-center">
-              Connect to your terminal console
-            </h5>
-            <p className="card-text">
-              You can connect to your terminal console by clicking on the
-              button below.
-            </p>
-          </div>
-          <CardFooter>
-            <Link
-              className="btn btn-success btn-block"
-              to="/terminal"
-            >
-              <i className="fa fa-desktop mr-1"></i>
-              <span>Connect to terminal</span>
-            </Link>
-          </CardFooter>
-        </div>
-      </div>
-    </div>
+    <TerminalLayout
+      onDisconnect={onDisconnect}
+      onFullscreenChange={focus}
+      onReconnect={onReconnect}
+      onZenChange={resizeTerminal}
+      terminalState={terminalState}
+      title={title}
+    >
+      <div
+        id="terminal-container"
+        className={
+          classNames("terminal fullscreen-content", {
+            'terminal-connected': terminalState === 'connected',
+            'terminal-disconnected': terminalState !== 'connected',
+          })
+        }
+        ref={terminalContainer}
+      />
+    </TerminalLayout>
   );
 }
 
