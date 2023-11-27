@@ -222,7 +222,7 @@ function useTerminal(containerRef) {
           if (/^\s*$/.test(title)) {
             fullTitle = 'Flight Console';
           } else {
-            fullTitle = `Flight Console: ${title}`;
+            fullTitle = title;
           }
           document.title = fullTitle;
           setTitle(fullTitle);
