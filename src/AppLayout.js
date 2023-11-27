@@ -6,7 +6,6 @@ import {
   AuthenticatedRoute,
   BrandBar,
   ConfigContext,
-  Footer,
 } from 'flight-webapp-components';
 
 import styles from './AppLayout.module.css';
@@ -37,7 +36,6 @@ function AppLayout() {
         />
       </div>
     </div>
-    <Footer />
     </>
   );
 }
