@@ -23,7 +23,6 @@ function AppLayout() {
       navItems={<NavItems includeHome={false} />}
     />
     <div
-      className="container-fluid"
       id="main"
     >
       <div id="toast-portal" className={styles.ToastPortal}></div>
@@ -35,7 +34,6 @@ function AppLayout() {
           Switch={Switch}
           exact={!unconfigured}
           routes={unconfigured ? unconfiguredRoutes : routes}
-          sideNav={SideNav}
           useLocation={useLocation}
           fullscreen={true}
         />
@@ -43,12 +41,6 @@ function AppLayout() {
     </div>
     <Footer />
     </>
-  );
-}
-
-function SideNav() {
-  return (
-    <div className="sidenav col-sm-2"></div>
   );
 }
 

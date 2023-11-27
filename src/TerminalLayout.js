@@ -13,28 +13,26 @@ function TerminalLayout({
     <div className="overflow-auto">
       <div className="row no-gutters">
         <div className="col">
-          <div className="card border-primary">
-            <div className="card-header bg-primary text-light">
-              <div className="row no-gutters">
-                <div className="col">
-                  <div className="d-flex align-items-center">
-                    <h5 className="flex-grow-1 mb-0">
-                      {title}
-                    </h5>
-                    <Toolbar
-                      terminalState={terminalState}
-                      onDisconnect={onDisconnect}
-                      onFullscreenChange={onFullscreenChange}
-                      onReconnect={onReconnect}
-                      onZenChange={onZenChange}
-                    />
-                  </div>
+          <div className="card-header toolbar bg-primary text-light">
+            <div className="row no-gutters">
+              <div className="col">
+                <div className="d-flex align-items-center">
+                  <h5 className="flex-grow-1 mb-0">
+                    {title}
+                  </h5>
+                  <Toolbar
+                    terminalState={terminalState}
+                    onDisconnect={onDisconnect}
+                    onFullscreenChange={onFullscreenChange}
+                    onReconnect={onReconnect}
+                    onZenChange={onZenChange}
+                  />
                 </div>
               </div>
             </div>
-            <div className="card-body p-0" style={{ backgroundColor: "#000" }}>
-              {children}
-            </div>
+          </div>
+          <div className="card-body p-0" style={{ backgroundColor: "#000" }}>
+            {children}
           </div>
         </div>
       </div>
@@ -78,7 +76,7 @@ function Toolbar({
     null;
 
   return (
-    <div className="btn-toolbar" style={{ minHeight: '31px' }}>
+    <div className="btn-toolbar">
       {fullscreenBtn}
       {disconnectBtn}
       {reconnectBtn}
