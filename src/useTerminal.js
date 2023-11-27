@@ -218,14 +218,16 @@ function useTerminal(containerRef) {
         })
 
         term.onTitleChange((title) => {
-          let fullTitle;
+          let terminalTitle;
+          let appTitle = 'Flight Console';
           if (/^\s*$/.test(title)) {
-            fullTitle = 'Flight Console';
+            terminalTitle = appTitle;
+            document.title = appTitle;
           } else {
-            fullTitle = title;
+            terminalTitle = title;
+            document.title = `${appTitle}: ${title}`;
           }
-          document.title = fullTitle;
-          setTitle(fullTitle);
+          setTitle(terminalTitle);
         });
 
       } else {
