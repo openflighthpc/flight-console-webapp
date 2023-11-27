@@ -13,7 +13,7 @@ function TerminalLayout({
     <div className="overflow-auto">
       <div className="row no-gutters">
         <div className="col">
-          <div className="card-header toolbar bg-primary text-light">
+          <div className="card-header toolbar text-light">
             <div className="row no-gutters">
               <div className="col">
                 <div className="d-flex align-items-center">
@@ -31,7 +31,7 @@ function TerminalLayout({
               </div>
             </div>
           </div>
-          <div className="card-body p-0" style={{ backgroundColor: "#000" }}>
+          <div className="card-body p-0 bg-black">
             {children}
           </div>
         </div>

@@ -21,7 +21,7 @@ function AuthenticatedDashboard() {
       <div
         id="terminal-container"
         className={
-          classNames("terminal fullscreen-content", {
+          classNames("terminal fullscreen-content bg-black", {
             'terminal-connected': terminalState === 'connected',
             'terminal-disconnected': terminalState !== 'connected',
           })
