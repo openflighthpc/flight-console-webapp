@@ -49,23 +49,19 @@ function Toolbar({
   terminalState,
 }) {
   const disconnectBtn = terminalState === 'connected' ? (
-    <button
-      className="btn btn-secondary btn-sm mr-1"
+    <i
+      className="fa fa-times ml-2 link"
+      title="Disconnect"
       onClick={onDisconnect}
-    >
-      <i className="fa fa-times mr-1"></i>
-      <span>Disconnect</span>
-    </button>
+    ></i>
   ) : null;
 
   const reconnectBtn = terminalState === 'disconnected' ? (
-    <button
-      className="btn btn-secondary btn-sm mr-1"
+    <i
+      className="fa fa-bolt ml-2 link"
+      title="Reconnect"
       onClick={onReconnect}
-    >
-      <i className="fa fa-bolt mr-1"></i>
-      <span>Reconnect</span>
-    </button>
+    ></i>
   ) : null;
 
   const fullscreenBtn = terminalState === 'connected' ?
