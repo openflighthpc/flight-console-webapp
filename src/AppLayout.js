@@ -9,7 +9,6 @@ import {
   Footer,
 } from 'flight-webapp-components';
 
-import NavItems from './NavItems';
 import styles from './AppLayout.module.css';
 import { routes, unconfiguredRoutes } from './routes';
 
@@ -20,7 +19,6 @@ function AppLayout() {
     <>
     <BrandBar
       className="brandbar"
-      navItems={<NavItems includeHome={false} />}
     />
     <div
       id="main"
