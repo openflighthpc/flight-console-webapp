@@ -16,26 +16,26 @@ function AppLayout() {
 
   return (
     <>
-    <BrandBar
-      className="brandbar"
-    />
-    <div
-      id="main"
-    >
-      <div id="toast-portal" className={styles.ToastPortal}></div>
-      <div className="content">
-        <AnimatedRouter
-          AuthenticatedRoute={AuthenticatedRoute}
-          Redirect={Redirect}
-          Route={Route}
-          Switch={Switch}
-          exact={!unconfigured}
-          routes={unconfigured ? unconfiguredRoutes : routes}
-          useLocation={useLocation}
-          fullscreen={true}
-        />
+      <BrandBar
+        className="brandbar"
+      />
+      <div
+        id="main"
+      >
+        <div id="toast-portal" className={styles.ToastPortal}></div>
+        <div className="content">
+          <AnimatedRouter
+            AuthenticatedRoute={AuthenticatedRoute}
+            Redirect={Redirect}
+            Route={Route}
+            Switch={Switch}
+            exact={!unconfigured}
+            routes={unconfigured ? unconfiguredRoutes : routes}
+            useLocation={useLocation}
+            fullscreen={true}
+          />
+        </div>
       </div>
-    </div>
     </>
   );
 }
