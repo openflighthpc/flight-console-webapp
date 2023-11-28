@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { NotFound } from 'flight-webapp-components';
 
 import Dashboard from './Dashboard';
-import TerminalPage from './TerminalPage';
 import UnconfiguredDashboard from './UnconfiguredDashboard';
 
 const notFoundRoute = {
@@ -19,22 +18,14 @@ const notFoundRoute = {
       }
     />
   ),
-  sideNav: true,
   key: 'notfound',
 };
 const routes = [
   {
-    path: '/terminal',
-    name: 'Terminal',
-    Component: TerminalPage,
-    authenticated: true,
-    sideNav: false,
-  },
-  {
     path: '/',
-    name: 'Home',
+    name: 'Console',
     Component: Dashboard,
-    sideNav: true,
+    authenticated: true,
   },
   notFoundRoute,
 ]
@@ -44,7 +35,6 @@ const unconfiguredRoutes = [
     path: '/',
     name: 'Home',
     Component: UnconfiguredDashboard,
-    sideNav: true,
   },
   notFoundRoute,
 ];
