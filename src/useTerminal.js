@@ -248,6 +248,7 @@ function useTerminal(containerRef) {
   function onDisconnect() {
     debug('disconnecting');
     if (socketRef.current) {
+      document.exitFullscreen();
       socketRef.current.disconnect();
     }
   }
