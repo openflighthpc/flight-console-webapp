@@ -1,11 +1,25 @@
 import React from 'react';
+import Logo from './assets/console.png';
 
 function Blurb() {
   return (
-    <p>
-      The Flight Console service allows you to access an interactive terminal
-      console session running on your cluster.
-    </p>
+    <>
+      <div
+        className="app-card"
+      >
+        <img
+          className="app-icon mr-3"
+          alt=""
+          src={Logo}
+        />
+        <h2 className="card-title card-text">
+          flight<strong>Console</strong>
+        </h2>
+        <p className="tagline card-subtitle card-text">
+          Access interactive console sessions.
+        </p>
+      </div>
+    </>
   );
 }
 
