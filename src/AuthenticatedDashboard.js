@@ -10,25 +10,31 @@ function AuthenticatedDashboard() {
     useTerminal(terminalContainer);
 
   return (
-    <TerminalLayout
-      onDisconnect={onDisconnect}
-      onFullscreenChange={focus}
-      onReconnect={onReconnect}
-      onZenChange={resizeTerminal}
-      terminalState={terminalState}
-      title={title}
-    >
+    <>
       <div
-        id="terminal-container"
-        className={
-          classNames("terminal fullscreen-content bg-black", {
-            'terminal-connected': terminalState === 'connected',
-            'terminal-disconnected': terminalState !== 'connected',
-          })
-        }
-        ref={terminalContainer}
-      />
-    </TerminalLayout>
+        className="centernav col-12 fullscreen"
+      >
+        <TerminalLayout
+          onDisconnect={onDisconnect}
+          onFullscreenChange={focus}
+          onReconnect={onReconnect}
+          onZenChange={resizeTerminal}
+          terminalState={terminalState}
+          title={title}
+        >
+          <div
+            id="terminal-container"
+            className={
+              classNames("terminal fullscreen-content bg-black", {
+                'terminal-connected': terminalState === 'connected',
+                'terminal-disconnected': terminalState !== 'connected',
+              })
+            }
+            ref={terminalContainer}
+          />
+        </TerminalLayout>
+      </div>
+    </>
   );
 }
 

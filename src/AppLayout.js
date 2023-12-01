@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import React, { useContext } from 'react';
 import { Redirect, Route, Switch, useLocation } from "react-router-dom";
 
 import {
@@ -32,7 +32,6 @@ function AppLayout() {
             exact={!unconfigured}
             routes={unconfigured ? unconfiguredRoutes : routes}
             useLocation={useLocation}
-            fullscreen={true}
           />
         </div>
       </div>

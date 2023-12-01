@@ -8,8 +8,8 @@ import {
 function UnauthenticatedDashboard() {
   return (
     <>
-      <div className="centernav unauthenticated">
-        <div className='contents'>
+      <div className="centernav col-8">
+        <div className='unauthenticated'>
           <Blurb />
           <p
             className='tagline'
