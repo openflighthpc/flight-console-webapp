@@ -25,7 +25,7 @@ const routes = [
     path: '/',
     name: 'Console',
     Component: Dashboard,
-    authenticated: true,
+    authenticated: false,
   },
   notFoundRoute,
 ]
