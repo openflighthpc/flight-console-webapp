@@ -9,7 +9,7 @@ function UnauthenticatedDashboard() {
   return (
     <>
       <div className="centernav col-8">
-        <div className='unauthenticated'>
+        <div className='narrow-container'>
           <Blurb />
           <p
             className='tagline'

@@ -5,7 +5,7 @@ function Blurb() {
   return (
     <>
       <div
-        className="app-card"
+        className="app-card blurb"
       >
         <img
           className="app-icon mr-3"
