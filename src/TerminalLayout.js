@@ -31,7 +31,7 @@ function TerminalLayout({
               </div>
             </div>
           </div>
-          <div className="card-body p-0 bg-black">
+          <div className="bg-black">
             {children}
           </div>
         </div>
