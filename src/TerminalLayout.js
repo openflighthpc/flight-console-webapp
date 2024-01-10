@@ -50,7 +50,7 @@ function Toolbar({
 }) {
   const disconnectBtn = terminalState === 'connected' ? (
     <i
-      className="fa fa-times ml-2 link"
+      className="fa fa-times ml-2 link white-text"
       title="Disconnect"
       onClick={onDisconnect}
     ></i>
@@ -58,7 +58,7 @@ function Toolbar({
 
   const reconnectBtn = terminalState === 'disconnected' ? (
     <i
-      className="fa fa-bolt ml-2 link"
+      className="fa fa-bolt ml-2 link white-text"
       title="Reconnect"
       onClick={onReconnect}
     ></i>
