@@ -1,5 +1,7 @@
 import { FullscreenButton } from 'flight-webapp-components';
 
+import styles from './Terminal.css';
+
 function TerminalLayout({
   children,
   onRefresh,
@@ -9,12 +11,18 @@ function TerminalLayout({
   terminalState,
   title,
 }) {
+  let host = '';
+  let currentDir = '';
   let fileManagerLocation = '../files';
-  if (title.includes(':~/')) {
-    fileManagerLocation += '?dir=' + title.split(':~/', 2)[1];
-  } else if (title.includes(':/')) {
-    fileManagerLocation += '?dir=' + title.split(':', 2)[1];
+  if (title.includes(':')) {
+    [ host, currentDir ] = title.split(':', 2);
+    if ( currentDir.startsWith('~/') ) {
+      fileManagerLocation += '?dir=' + currentDir.split('~/', 2)[1];
+    } else if ( currentDir.startsWith('/') ) {
+      fileManagerLocation += '?dir=' + currentDir;
+    }
   }
+  console.log(styles.BoldHost);
   
   return (
     <div className="overflow-auto">
@@ -25,7 +33,8 @@ function TerminalLayout({
               <div className="col">
                 <div className="d-flex align-items-center">
                   <h5 className="flex-grow-1 mb-0">
-                    {title}
+                    <span className="font-weight-bolder">{host} - </span>
+                    {currentDir}
                   </h5>
                   <Toolbar
                     terminalState={terminalState}
