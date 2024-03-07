@@ -1,7 +1,5 @@
 import { FullscreenButton } from 'flight-webapp-components';
 
-import styles from './Terminal.css';
-
 function TerminalLayout({
   children,
   onRefresh,
@@ -22,7 +20,6 @@ function TerminalLayout({
       fileManagerLocation += '?dir=' + currentDir;
     }
   }
-  console.log(styles.BoldHost);
   
   return (
     <div className="overflow-auto">
