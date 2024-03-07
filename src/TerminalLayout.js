@@ -9,6 +9,13 @@ function TerminalLayout({
   terminalState,
   title,
 }) {
+  let fileManagerLocation = '../files';
+  if (title.includes(':~/')) {
+    fileManagerLocation += '?dir=' + title.split(':~/', 2)[1];
+  } else if (title.includes(':/')) {
+    fileManagerLocation += '?dir=' + title.split(':', 2)[1];
+  }
+  
   return (
     <div className="overflow-auto">
       <div className="row no-gutters">
@@ -26,6 +33,7 @@ function TerminalLayout({
                     onFullscreenChange={onFullscreenChange}
                     onReconnect={onReconnect}
                     onZenChange={onZenChange}
+                    fileManagerLocation={fileManagerLocation}
                   />
                 </div>
               </div>
@@ -47,6 +55,7 @@ function Toolbar({
   onReconnect,
   onZenChange,
   terminalState,
+  fileManagerLocation
 }) {
   const refreshBtn = terminalState === 'connected' ? (
     <i
@@ -55,13 +64,17 @@ function Toolbar({
       onClick={onRefresh}
     ></i>
   ) : null;
-
-  const reconnectBtn = terminalState === 'disconnected' ? (
+  
+  const ToFilesBtn = terminalState === 'connected' ? (
     <i
-      className="fa fa-bolt ml-2 link white-text"
-      title="Reconnect"
-      onClick={onReconnect}
-    ></i>
+      title="files" className='mr-2'
+    >
+      <a
+        className="fa-regular fa-file-lines ml-2 link white-text"
+        href={fileManagerLocation}
+      >
+      </a>
+    </i>
   ) : null;
 
   const fullscreenBtn = terminalState === 'connected' ?
@@ -74,8 +87,8 @@ function Toolbar({
   return (
     <div className="btn-toolbar">
       {fullscreenBtn}
+      {ToFilesBtn}
       {refreshBtn}
-      {reconnectBtn}
     </div>
   );
 }
