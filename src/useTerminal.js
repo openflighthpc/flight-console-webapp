@@ -245,12 +245,13 @@ function useTerminal(containerRef) {
     })
   }
 
-  function onDisconnect() {
+  function onRefresh() {
     debug('disconnecting');
     if (socketRef.current) {
       document.exitFullscreen();
       socketRef.current.disconnect();
     }
+    onReconnect();
   }
 
   function onReconnect() {
@@ -265,7 +266,7 @@ function useTerminal(containerRef) {
     termRef.current.focus();
   }
 
-  return { focus, onDisconnect, onReconnect, resizeTerminal, terminalState, title };
+  return { focus, onRefresh, onReconnect, resizeTerminal, terminalState, title };
 }
 
 function addRecoverableToast(responseBody, requestedDir, addToast) {

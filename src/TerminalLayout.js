@@ -2,7 +2,7 @@ import { FullscreenButton } from 'flight-webapp-components';
 
 function TerminalLayout({
   children,
-  onDisconnect,
+  onRefresh,
   onFullscreenChange,
   onReconnect,
   onZenChange,
@@ -22,7 +22,7 @@ function TerminalLayout({
                   </h5>
                   <Toolbar
                     terminalState={terminalState}
-                    onDisconnect={onDisconnect}
+                    onRefresh={onRefresh}
                     onFullscreenChange={onFullscreenChange}
                     onReconnect={onReconnect}
                     onZenChange={onZenChange}
@@ -42,17 +42,17 @@ function TerminalLayout({
 
 
 function Toolbar({
-  onDisconnect,
+  onRefresh,
   onFullscreenChange,
   onReconnect,
   onZenChange,
   terminalState,
 }) {
-  const disconnectBtn = terminalState === 'connected' ? (
+  const refreshBtn = terminalState === 'connected' ? (
     <i
-      className="fa fa-times ml-2 link white-text"
-      title="Disconnect"
-      onClick={onDisconnect}
+      className="fa fa-arrows-rotate ml-2 link white-text"
+      title="Refresh"
+      onClick={onRefresh}
     ></i>
   ) : null;
 
@@ -74,7 +74,7 @@ function Toolbar({
   return (
     <div className="btn-toolbar">
       {fullscreenBtn}
-      {disconnectBtn}
+      {refreshBtn}
       {reconnectBtn}
     </div>
   );

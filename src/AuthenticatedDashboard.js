@@ -6,7 +6,7 @@ import TerminalLayout from "./TerminalLayout";
 
 function AuthenticatedDashboard() {
   const terminalContainer = useRef(null);
-  const { focus, onDisconnect, onReconnect, resizeTerminal, terminalState, title } =
+  const { focus, onRefresh, onReconnect, resizeTerminal, terminalState, title } =
     useTerminal(terminalContainer);
 
   return (
@@ -15,7 +15,7 @@ function AuthenticatedDashboard() {
         className="centernav col-12 fullscreen"
       >
         <TerminalLayout
-          onDisconnect={onDisconnect}
+          onRefresh={onRefresh}
           onFullscreenChange={focus}
           onReconnect={onReconnect}
           onZenChange={resizeTerminal}
