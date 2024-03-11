@@ -9,6 +9,18 @@ function TerminalLayout({
   terminalState,
   title,
 }) {
+  let host = '';
+  let currentDir = '';
+  let fileManagerLocation = '../files';
+  if (title.includes(':')) {
+    [ host, currentDir ] = title.split(':', 2);
+    if ( currentDir.startsWith('~/') ) {
+      fileManagerLocation += '?dir=' + currentDir.split('~/', 2)[1];
+    } else if ( currentDir.startsWith('/') ) {
+      fileManagerLocation += '?dir=' + currentDir;
+    }
+  }
+  
   return (
     <div className="overflow-auto">
       <div className="row no-gutters">
@@ -18,7 +30,8 @@ function TerminalLayout({
               <div className="col">
                 <div className="d-flex align-items-center">
                   <h5 className="flex-grow-1 mb-0">
-                    {title}
+                    <span className="font-weight-bolder">{host} - </span>
+                    {currentDir}
                   </h5>
                   <Toolbar
                     terminalState={terminalState}
@@ -26,6 +39,7 @@ function TerminalLayout({
                     onFullscreenChange={onFullscreenChange}
                     onReconnect={onReconnect}
                     onZenChange={onZenChange}
+                    fileManagerLocation={fileManagerLocation}
                   />
                 </div>
               </div>
@@ -47,6 +61,7 @@ function Toolbar({
   onReconnect,
   onZenChange,
   terminalState,
+  fileManagerLocation
 }) {
   const refreshBtn = terminalState === 'connected' ? (
     <i
@@ -63,6 +78,18 @@ function Toolbar({
       onClick={onReconnect}
     ></i>
   ) : null;
+  
+  const ToFilesBtn = terminalState === 'connected' ? (
+    <i
+      title="Manage files" className='mr-2'
+    >
+      <a
+        className="fa-regular fa-file-lines ml-2 link white-text"
+        href={fileManagerLocation}
+      >
+      </a>
+    </i>
+  ) : null;
 
   const fullscreenBtn = terminalState === 'connected' ?
     <FullscreenButton
@@ -74,6 +101,7 @@ function Toolbar({
   return (
     <div className="btn-toolbar">
       {fullscreenBtn}
+      {ToFilesBtn}
       {refreshBtn}
       {reconnectBtn}
     </div>
