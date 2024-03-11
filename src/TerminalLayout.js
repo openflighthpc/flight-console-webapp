@@ -73,7 +73,7 @@ function Toolbar({
   
   const ToFilesBtn = terminalState === 'connected' ? (
     <i
-      title="files" className='mr-2'
+      title="Manage files" className='mr-2'
     >
       <a
         className="fa-regular fa-file-lines ml-2 link white-text"
