@@ -11,6 +11,9 @@
 # production
 /build
 
+# rubymine
+/.idea
+
 # misc
 .DS_Store
 .env.local

@@ -218,14 +218,16 @@ function useTerminal(containerRef) {
         })
 
         term.onTitleChange((title) => {
-          let fullTitle;
+          let terminalTitle;
+          let appTitle = 'Flight Console';
           if (/^\s*$/.test(title)) {
-            fullTitle = 'Flight Console';
+            terminalTitle = appTitle;
+            document.title = appTitle;
           } else {
-            fullTitle = `Flight Console: ${title}`;
+            terminalTitle = title;
+            document.title = `${appTitle}: ${title}`;
           }
-          document.title = fullTitle;
-          setTitle(fullTitle);
+          setTitle(terminalTitle);
         });
 
       } else {
@@ -243,11 +245,13 @@ function useTerminal(containerRef) {
     })
   }
 
-  function onDisconnect() {
+  function onRefresh() {
     debug('disconnecting');
     if (socketRef.current) {
+      document.exitFullscreen();
       socketRef.current.disconnect();
     }
+    onReconnect();
   }
 
   function onReconnect() {
@@ -262,7 +266,7 @@ function useTerminal(containerRef) {
     termRef.current.focus();
   }
 
-  return { focus, onDisconnect, onReconnect, resizeTerminal, terminalState, title };
+  return { focus, onRefresh, onReconnect, resizeTerminal, terminalState, title };
 }
 
 function addRecoverableToast(responseBody, requestedDir, addToast) {
