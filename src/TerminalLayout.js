@@ -70,6 +70,14 @@ function Toolbar({
       onClick={onRefresh}
     ></i>
   ) : null;
+
+  const reconnectBtn = terminalState === 'disconnected' ? (
+    <i
+      className="fa fa-bolt ml-2 link white-text"
+      title="Reconnect"
+      onClick={onReconnect}
+    ></i>
+  ) : null;
   
   const ToFilesBtn = terminalState === 'connected' ? (
     <i
@@ -95,6 +103,7 @@ function Toolbar({
       {fullscreenBtn}
       {ToFilesBtn}
       {refreshBtn}
+      {reconnectBtn}
     </div>
   );
 }
