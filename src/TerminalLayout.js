@@ -80,15 +80,15 @@ function Toolbar({
   ) : null;
   
   const ToFilesBtn = terminalState === 'connected' ? (
-    <i
-      title="Manage files" className='mr-2'
+    <a
+      className="link white-text ml-2 mr-3"
+      href={fileManagerLocation}
     >
-      <a
-        className="fa-regular fa-file-lines ml-2 link white-text"
-        href={fileManagerLocation}
-      >
-      </a>
-    </i>
+      <i
+        className="fa-regular fa-file-lines"
+        title="Manage files"
+      ></i>
+    </a>
   ) : null;
 
   const fullscreenBtn = terminalState === 'connected' ?
