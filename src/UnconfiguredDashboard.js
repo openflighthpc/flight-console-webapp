@@ -1,11 +1,8 @@
 import React from 'react';
 
-import { DashboardLogo } from 'flight-webapp-components';
-
 function UnconfiguredDashboard() {
   return (
     <div>
-      <DashboardLogo />
       <p>
         Flight Console Service allows you to access an interactive terminal
         console session running on your cluster from the comfort of your
@@ -27,6 +24,5 @@ function UnconfiguredDashboard() {
     </div>
   );
 }
-
 
 export default UnconfiguredDashboard;

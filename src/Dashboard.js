@@ -8,7 +8,7 @@ import AuthenticatedDashboard from './AuthenticatedDashboard';
 function Dashboard() {
   const { currentUser } = useContext(CurrentUserContext);
 
-  if (currentUser == null) { 
+  if (currentUser == null) {
     return (
       <UnauthenticatedDashboard />
     );
@@ -18,6 +18,5 @@ function Dashboard() {
     );
   }
 }
-
 
 export default Dashboard;
